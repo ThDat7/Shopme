@@ -1,5 +1,7 @@
 package com.shopme.common.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -28,9 +30,11 @@ public class Category {
 
     @OneToOne()
     @JoinColumn(name = "parent_id")
+    @JsonBackReference
     private Category parent;
 
     @OneToMany(mappedBy = "parent")
+    @JsonManagedReference
     private Set<Category> children = new HashSet<>();
 
     public Category(String name) {
@@ -46,5 +50,14 @@ public class Category {
 
     public Category(int id) {
         this.id = id;
+    }
+
+
+    public Category getParent() {
+        return parent;
+    }
+
+    public Set<Category> getChildren() {
+        return children;
     }
 }

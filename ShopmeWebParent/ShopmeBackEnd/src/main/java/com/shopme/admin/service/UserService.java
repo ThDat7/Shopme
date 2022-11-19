@@ -47,7 +47,7 @@ public class UserService {
         Root<User> root = cq.from(User.class);
         cq.select(root);
 
-        Integer pageNumber = 0;
+        Integer pageIndex = 0;
         Sort sort = Sort.by(User_.ID);
 
         for (String key :  requestParams.keySet()) {
@@ -86,7 +86,7 @@ public class UserService {
 
                 case page: {
                     if (StringUtils.isInteger(value))
-                        pageNumber = Integer.valueOf(value) - 1;
+                        pageIndex = Integer.valueOf(value) - 1;
                     break;
                 }
             }
@@ -96,7 +96,7 @@ public class UserService {
         cq.orderBy(orders);
 
         return em.createQuery(cq)
-                .setFirstResult(pageNumber * USER_PER_PAGE)
+                .setFirstResult(pageIndex * USER_PER_PAGE)
                 .setMaxResults(USER_PER_PAGE)
                 .getResultList();
     }
@@ -111,6 +111,7 @@ public class UserService {
 
     public void create(User user, MultipartFile multipartFile) {
         encodePassword(user);
+        userRepository.save(user);
         saveImage(multipartFile, user);
     }
 
