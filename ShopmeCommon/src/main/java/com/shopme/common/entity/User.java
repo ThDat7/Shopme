@@ -31,11 +31,11 @@ public class User {
     private String lastName;
 
     @Column(length = 64)
-    private String photo;
+    private String photos;
 
     private boolean enabled;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "users_roles"
             , joinColumns = @JoinColumn(name = "user_id"),
@@ -47,7 +47,7 @@ public class User {
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.photo = photo;
+        this.photos = photo;
         this.enabled = enabled;
         this.roles = roles;
     }

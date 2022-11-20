@@ -16,15 +16,20 @@ import java.util.Optional;
 @Transactional
 public interface UserRepository extends JpaRepository<User, Integer>,
         JpaSpecificationExecutor<User> {
-    public void deleteByEmail(String email);
+    void deleteByEmail(String email);
 
     @Query("SELECT u FROM User u WHERE CONCAT(u.id, ' ', u.email, ' '" +
             ", u.firstName, ' ', u.lastName) LIKE %:keyword%")
-    public List<User> searchByKeyword(String keyword);
+    List<User> searchByKeyword(String keyword);
 
-    public Optional<User> findByEmail(String s);
+    Optional<User> findByEmail(String s);
 
     @Query("UPDATE User u SET u.enabled = :status WHERE u.id = :id")
     @Modifying
-    public void updateStatus(Integer id, Boolean status);
+    void updateStatus(Integer id, Boolean status);
+
+    boolean existsByEmail(String email);
+
+    @Query("SELECT u.password FROM User u WHERE u.email = :email")
+    String getPasswordByEmail(String email);
 }

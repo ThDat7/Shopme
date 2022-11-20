@@ -10,8 +10,6 @@ import com.shopme.common.metamodel.User_;
 import com.shopme.common.paramFilter.UserParamFilter;
 import com.shopme.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +22,6 @@ import javax.persistence.criteria.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -102,7 +99,8 @@ public class UserService {
     }
 
     public User findById(int id) {
-        return userRepository.findById(id).get();
+        return userRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     public void delete(int id) {
@@ -117,7 +115,13 @@ public class UserService {
 
     public void edit(int id, User user, MultipartFile multipartFile) {
         user.setId(id);
+
+        if (user.getPassword().isEmpty() || user.getPassword() == null) {
+            String oldEncodedPassword = userRepository.getPasswordByEmail(user.getEmail());
+            user.setPassword(oldEncodedPassword);
+        } else encodePassword(user);
         userRepository.save(user);
+
         saveImage(multipartFile, user);
     }
 
@@ -128,12 +132,12 @@ public class UserService {
                 .cleanPath(multipartFile.getOriginalFilename());
         String uploadDir = USER_PHOTO_DIR + user.getId();
 
-        if (user.getPhoto() != null && !user.getPhoto().isEmpty())
+        if (user.getPhotos() != null && !user.getPhotos().isEmpty())
             FileUploadUtil.cleanDir(uploadDir);
 
         try {
             FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-            user.setPhoto(fileName);
+            user.setPhotos(fileName);
         } catch (IOException e) {
             throw new ImageProcessException();
         }
@@ -145,15 +149,18 @@ public class UserService {
     }
 
     public User getByEmail(String s) {
-        return userRepository.findByEmail(s).orElseThrow(ResourceNotFoundException::new);
+        return userRepository.findByEmail(s)
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     public void validateEmailUnique(String email) {
-        Optional<User> findByEmail = userRepository.findByEmail(email);
-        findByEmail.ifPresent(u -> { throw new ResourceAlreadyExistException(); });
+        if (userRepository.existsByEmail(email))
+            throw new ResourceAlreadyExistException();
     }
 
     public void updateStatus(int id, Boolean status) {
+        if (!userRepository.existsById(id))
+            throw new ResourceNotFoundException();
         userRepository.updateStatus(id, status);
     }
 }
