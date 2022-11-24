@@ -1,4 +1,4 @@
-package com.shopme.admin.exception;
+package com.shopme.admin.advice;
 
 
 import org.springframework.http.HttpStatus;

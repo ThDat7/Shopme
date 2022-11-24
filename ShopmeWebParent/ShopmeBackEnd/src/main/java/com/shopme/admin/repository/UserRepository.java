@@ -16,6 +16,7 @@ import java.util.Optional;
 @Transactional
 public interface UserRepository extends JpaRepository<User, Integer>,
         JpaSpecificationExecutor<User> {
+    @Modifying
     void deleteByEmail(String email);
 
     @Query("SELECT u FROM User u WHERE CONCAT(u.id, ' ', u.email, ' '" +
@@ -32,4 +33,7 @@ public interface UserRepository extends JpaRepository<User, Integer>,
 
     @Query("SELECT u.password FROM User u WHERE u.email = :email")
     String getPasswordByEmail(String email);
+
+    @Query("SELECT u.id FROM User u WHERE u.email = :email")
+    int getIdByEmail(String email);
 }

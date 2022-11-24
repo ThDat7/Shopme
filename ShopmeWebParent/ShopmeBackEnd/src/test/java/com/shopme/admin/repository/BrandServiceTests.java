@@ -14,29 +14,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 public class BrandServiceTests {
-    @MockBean
-    private BrandRepository repo;
-
-    @InjectMocks
-    private BrandService service;
-
-    @Test
-    public void testCheckUniqueReturnDuplicate() {
-        String name = "Acer";
-
-        Mockito.when(repo.existsByName(name)).thenReturn(true);
-
-        service.validateNameUnique(name);
-    }
-
-    @Test
-    public void testCheckUniqueOk() {
-        String name = "AMD";
-
-        Mockito.when(repo.existsByName(name));
-
-        service.validateNameUnique(name);
-    }
+//    @MockBean
+//    private BrandRepository repo;
+//
+//    @InjectMocks
+//    private BrandService service;
+//
+//    @Test
+//    public void testCheckUniqueReturnDuplicate() {
+//        String name = "Acer";
+//
+//        Mockito.when(repo.existsByName(name)).thenReturn(true);
+//
+//        service.validateNameUnique(name);
+//    }
+//
+//    @Test
+//    public void testCheckUniqueOk() {
+//        String name = "AMD";
+//
+//        Mockito.when(repo.existsByName(name));
+//
+//        service.validateNameUnique(name);
+//    }
 
 
 }

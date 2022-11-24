@@ -60,4 +60,6 @@ public class ShopmeUserDetails implements UserDetails {
     public boolean isEnabled() {
         return user.isEnabled();
     }
+
+    public int getId() {return user.getId();}
 }
