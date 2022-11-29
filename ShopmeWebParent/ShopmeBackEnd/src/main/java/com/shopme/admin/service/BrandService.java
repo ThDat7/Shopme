@@ -6,6 +6,7 @@ import com.shopme.admin.exception.ResourceAlreadyExistException;
 import com.shopme.admin.exception.ResourceNotFoundException;
 import com.shopme.admin.repository.BrandRepository;
 import com.shopme.common.entity.Brand;
+import com.shopme.common.entity.Category;
 import com.shopme.common.metamodel.Brand_;
 import com.shopme.common.paramFilter.BrandParamFilter;
 import com.shopme.common.util.StringUtils;
@@ -18,10 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class BrandService {
-    private static final String BRAND_PHOTO_DIR = "";
+    private static final String BRAND_PHOTO_DIR = "../brand-logos/";
     private static final Integer BRAND_PER_PAGE = 10;
 
 
@@ -116,5 +118,9 @@ public class BrandService {
 
     public void validateNameUnique(String name) {
         if (repo.existsByName(name)) throw new ResourceAlreadyExistException();
+    }
+
+    public List<Category> getCategoriesByBrandId(int id) {
+        return repo.getCategoriesById(id);
     }
 }
