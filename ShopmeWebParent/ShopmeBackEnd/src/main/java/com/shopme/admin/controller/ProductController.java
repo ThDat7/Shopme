@@ -70,8 +70,8 @@ public class ProductController {
 
         productImageService.setExistingExtraImageNames(imageIDs, imageNames, product);
         productImageService.setNewExtraImageNames(extraImageMultipart, product);
-        productImageService.deleteExtraImagesWereRemovedOnForm(product);
         productImageService.saveUploadedImages(mainImageMultipart, extraImageMultipart, product);
+        productImageService.deleteExtraImagesWereRemovedOnForm(product);
 
         productService.saveDetails(product, details);
     }
