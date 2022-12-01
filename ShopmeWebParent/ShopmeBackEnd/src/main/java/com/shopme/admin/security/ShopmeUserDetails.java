@@ -6,10 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ShopmeUserDetails implements UserDetails {
     private User user;
@@ -62,4 +59,16 @@ public class ShopmeUserDetails implements UserDetails {
     }
 
     public int getId() {return user.getId();}
+
+    public boolean hasRole(String roleName) {
+        Iterator<Role> roles = this.user.getRoles().iterator();
+
+        while(roles.hasNext()) {
+            Role role = roles.next();
+            if (role.getName().equals(roleName)) return true;
+        }
+
+        return false;
+
+    }
 }

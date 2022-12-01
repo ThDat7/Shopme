@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -83,7 +84,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/users/**").hasAnyAuthority("Admin")
                     .antMatchers( "/categories/**").hasAnyAuthority("Admin", "Editor")
                     .antMatchers( "/brands/**").hasAnyAuthority("Admin", "Editor", "Brands")
+
                     .antMatchers("/products/**").permitAll()
+                    .antMatchers("/products/create", "/products/**/delete")
+                        .hasAnyAuthority("Admin", "Editor")
+                    .antMatchers("/products/**/edit", "/products/save", "/products/check-name")
+                        .hasAnyAuthority("Admin", "Editor", "Salesperson")
+                    .antMatchers("/products", "/products/")
+                        .hasAnyAuthority("Admin", "Edtiro", "Salesperson", "Shipper")
+                    .antMatchers("/products/**").hasAnyAuthority("Admin", "Edtior")
+
+
                     .antMatchers("/login", "/refreshtoken").permitAll()
                     .anyRequest().authenticated();
 

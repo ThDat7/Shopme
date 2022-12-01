@@ -1,9 +1,11 @@
 package com.shopme.admin.controller;
 
+import com.shopme.admin.security.ShopmeUserDetails;
 import com.shopme.admin.service.ProductService;
 import com.shopme.common.entity.Product;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,13 +43,18 @@ public class ProductController {
     @PostMapping("/{id}/edit")
     @ResponseStatus(HttpStatus.OK)
     public void edit(Product product,
-                              @PathVariable(name = "id") int id,
-                              @RequestParam(name = "fileImage")
+                     @PathVariable(name = "id") int id,
+                     @RequestParam(name = "fileImage")
                               MultipartFile mainImageMultipart,
-                              @RequestParam(name = "extraImage")
+                     @RequestParam(name = "extraImage")
                               MultipartFile[] extraImageMultipart,
-                              @RequestParam(name = "details", required = false)
-                              HashMap<String, String> details) {
+                     @RequestParam(name = "details", required = false)
+                              HashMap<String, String> details,
+                     @AuthenticationPrincipal ShopmeUserDetails loggedUser) {
+        if (loggedUser.hasRole("Salesperson")) {
+
+        }
+
         productService.edit(id, product);
         productService.saveImages(product, mainImageMultipart, extraImageMultipart);
         productService.saveDetails(product, details);

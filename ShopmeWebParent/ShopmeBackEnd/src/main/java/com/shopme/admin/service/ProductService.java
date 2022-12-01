@@ -116,6 +116,25 @@ public class ProductService {
 
     }
 
+    public void edit(int id, Product product) {
+        product.setId(id);
+        product.setUpdatedTime(new Date());
+        setAlias(product);
+
+        productRepository.save(product);
+    }
+
+    public void saveProductPrice(int id, Product productInForm) {
+        Product productInDB = productRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
+
+        productInDB.setCost(productInForm.getCost());
+        productInDB.setPrice(productInForm.getPrice());
+        productInDB.setDiscountPercent(productInForm.getDiscountPercent());
+
+        productRepository.save(productInDB);
+    }
+
     public void saveImages(Product product, MultipartFile mainImageMultipart,
                           MultipartFile[] extraImageMultipart) {
         productImageService.saveImage(mainImageMultipart, extraImageMultipart, product);
@@ -123,14 +142,6 @@ public class ProductService {
 
     public void saveDetails(Product product, HashMap<String, String> details) {
         productDetailService.setProductDetails(details, product);
-    }
-
-    public void edit(int id, Product product) {
-        product.setId(id);
-        product.setUpdatedTime(new Date());
-        setAlias(product);
-
-        productRepository.save(product);
     }
 
     private void setAlias(Product product) {
