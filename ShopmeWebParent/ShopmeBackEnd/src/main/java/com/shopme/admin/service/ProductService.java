@@ -4,6 +4,7 @@ import com.shopme.admin.exception.ResourceAlreadyExistException;
 import com.shopme.admin.exception.ResourceNotFoundException;
 import com.shopme.admin.repository.ProductRepository;
 import com.shopme.common.entity.Product;
+import com.shopme.common.entity.ProductDetail;
 import com.shopme.common.metamodel.Product_;
 import com.shopme.common.paramFilter.ProductParamFilter;
 import com.shopme.common.specification.Filter;
@@ -135,12 +136,7 @@ public class ProductService {
         productRepository.save(productInDB);
     }
 
-    public void saveImages(Product product, MultipartFile mainImageMultipart,
-                          MultipartFile[] extraImageMultipart) {
-        productImageService.saveImage(mainImageMultipart, extraImageMultipart, product);
-    }
-
-    public void saveDetails(Product product, HashMap<String, String> details) {
+    public void saveDetails(Product product, HashSet<ProductDetail> details) {
         productDetailService.setProductDetails(details, product);
     }
 

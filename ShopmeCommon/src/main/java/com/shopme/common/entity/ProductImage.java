@@ -26,4 +26,6 @@ public class ProductImage {
         this.name = name;
         this.product = product;
     }
+
+
 }

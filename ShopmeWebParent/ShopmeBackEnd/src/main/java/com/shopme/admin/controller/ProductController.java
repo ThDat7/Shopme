@@ -1,8 +1,10 @@
 package com.shopme.admin.controller;
 
 import com.shopme.admin.security.ShopmeUserDetails;
+import com.shopme.admin.service.ProductImageService;
 import com.shopme.admin.service.ProductService;
 import com.shopme.common.entity.Product;
+import com.shopme.common.entity.ProductDetail;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -10,14 +12,18 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
-    private ProductService productService;
+    private final ProductService productService;
 
-    public ProductController(ProductService productService) {
+    private final ProductImageService productImageService;
+
+    public ProductController(ProductService productService, ProductImageService productImageService) {
         this.productService = productService;
+        this.productImageService = productImageService;
     }
 
     @GetMapping
@@ -34,9 +40,11 @@ public class ProductController {
                               @RequestParam(name = "extraImage")
                               MultipartFile[] extraImageMultipart,
                               @RequestParam(name = "details", required = false)
-                              HashMap<String, String> details) {
+                              HashSet<ProductDetail> details) {
         productService.create(product);
-        productService.saveImages(product, mainImageMultipart, extraImageMultipart);
+
+        productImageService.saveImage(mainImageMultipart, extraImageMultipart, product);
+
         productService.saveDetails(product, details);
     }
 
@@ -48,8 +56,10 @@ public class ProductController {
                               MultipartFile mainImageMultipart,
                      @RequestParam(name = "extraImage")
                               MultipartFile[] extraImageMultipart,
+                     @RequestParam(name = "imageIDs", required = false) String[] imageIDs,
+                     @RequestParam(name = "imageNames", required = false) String[] imageNames,
                      @RequestParam(name = "details", required = false)
-                              HashMap<String, String> details,
+                         HashSet<ProductDetail> details,
                      @AuthenticationPrincipal ShopmeUserDetails loggedUser) {
         if (loggedUser.hasRole("Salesperson")) {
             productService.saveProductPrice(id, product);
@@ -57,7 +67,12 @@ public class ProductController {
         }
 
         productService.edit(id, product);
-        productService.saveImages(product, mainImageMultipart, extraImageMultipart);
+
+        productImageService.setExistingExtraImageNames(imageIDs, imageNames, product);
+        productImageService.setNewExtraImageNames(extraImageMultipart, product);
+        productImageService.deleteExtraImagesWereRemovedOnForm(product);
+        productImageService.saveUploadedImages(mainImageMultipart, extraImageMultipart, product);
+
         productService.saveDetails(product, details);
     }
 
