@@ -125,6 +125,13 @@ public class CategoryService {
     }
 
     public void create(Category category) {
+        setAllParentIds(category);
+        repository.save(category);
+    }
+
+    public void edit(int id, Category category) {
+        category.setId(id);
+        setAllParentIds(category);
         repository.save(category);
     }
 
@@ -132,8 +139,14 @@ public class CategoryService {
         repository.deleteById(id);
     }
 
-    public void edit(int id, Category category) {
-        repository.save(category);
+    private void setAllParentIds(Category category) {
+        Category parent = category.getParent();
+
+        if (parent == null) return;
+
+        String allParentIds = parent.getAllParentIds() == null ? "-" : parent.getAllParentIds();
+        allParentIds += parent.getId() + "-";
+        category.setAllParentIds(allParentIds);
     }
 
     public void validateNameUnique(String name) {

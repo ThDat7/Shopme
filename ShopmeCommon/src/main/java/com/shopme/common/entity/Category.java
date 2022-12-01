@@ -28,6 +28,10 @@ public class Category {
 
     private boolean enabled;
 
+
+    @Column(name = "all_parent_ids", length = 256, nullable = false)
+    private String allParentIds;
+
     @OneToOne()
     @JoinColumn(name = "parent_id")
     @JsonBackReference

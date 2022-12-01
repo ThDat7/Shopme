@@ -19,8 +19,9 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok().body(productService.getAll());
+    public ResponseEntity<?> getAll(@RequestParam HashMap<String, String> requestParams)  {
+        return ResponseEntity.ok().body(
+                productService.getAll(requestParams));
     }
 
     @PostMapping("/create")
