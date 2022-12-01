@@ -52,7 +52,8 @@ public class ProductController {
                               HashMap<String, String> details,
                      @AuthenticationPrincipal ShopmeUserDetails loggedUser) {
         if (loggedUser.hasRole("Salesperson")) {
-
+            productService.saveProductPrice(id, product);
+            return;
         }
 
         productService.edit(id, product);
