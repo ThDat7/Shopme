@@ -1,7 +1,7 @@
 package com.shopme.admin.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shopme.admin.advice.ErrorResponse;
+import com.shopme.common.advice.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;

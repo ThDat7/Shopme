@@ -1,32 +1,31 @@
 package com.shopme.admin.service;
 
-import com.shopme.admin.exception.ResourceAlreadyExistException;
-import com.shopme.admin.exception.ResourceNotFoundException;
 import com.shopme.admin.repository.ProductRepository;
 import com.shopme.common.entity.Product;
 import com.shopme.common.entity.ProductDetail;
+import com.shopme.common.exception.ResourceAlreadyExistException;
+import com.shopme.common.exception.ResourceNotFoundException;
+import com.shopme.common.metamodel.Brand_;
+import com.shopme.common.metamodel.Category_;
 import com.shopme.common.metamodel.Product_;
 import com.shopme.common.paramFilter.ProductParamFilter;
+import com.shopme.common.paramFilter.RequestParamsHelper;
 import com.shopme.common.specification.Filter;
-import com.shopme.common.util.StringUtils;
+import com.shopme.common.specification.SpecificationHelper;
+import com.shopme.common.specification.SpecificationOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ProductService {
 
-    private static final int PRODUCT_PER_PAGE = 10;
+//    private static final int PRODUCT_PER_PAGE = 10;
 
     @Autowired
     private ProductDetailService productDetailService;
@@ -38,13 +37,7 @@ public class ProductService {
     private ProductRepository productRepository;
 
     public Page<Product> getAll(HashMap<String, String> requestParams) {
-        Sort sort = Sort.by(Product_.NAME).ascending();
-        int pageIndex = 0;
-
-        Set<Filter> filters = new HashSet<>();
-
-        String keywordSearch = "";
-        Integer categoryId = null;
+        Specification specification = Specification.not(null);
 
         for (String key : requestParams.keySet()) {
             String value = requestParams.get(key);
@@ -55,52 +48,86 @@ public class ProductService {
             } catch(IllegalArgumentException e) { continue; }
             switch (enumKey) {
                 case keyword: {
-                    keywordSearch = value;
-                    break;
-                }
+                    String keywordSearch = value;
+                    Filter searchName = Filter.builder()
+                            .field(Product_.NAME).build();
 
-                case order: {
-                    if (value.equals("desc")) sort = sort.descending();
-                    else sort = sort.ascending();
-                    break;
-                }
+                    Filter searchShortDescription = Filter.builder()
+                            .field(Product_.SHORT_DESCRIPTION).build();
 
-                case sortBy: {
-                    sort = sort.by(value);
-                    break;
-                }
+                    Filter searchFulLDescription = Filter.builder()
+                            .field(Product_.FULL_DESCRIPTION).build();
 
-                case page: {
-                    if (StringUtils.isInteger(value))
-                        pageIndex = Integer.valueOf(value) - 1;
+                    Filter searchBrandName = Filter.builder()
+                            .joinTables(Arrays.asList(Product_.BRAND))
+                            .field(Brand_.NAME).build();
+
+                    Filter searchCategoryName = Filter.builder()
+                            .joinTables(Arrays.asList(Product_.CATEGORY))
+                            .field(Product_.NAME).build();
+
+                    List<Filter> searchFilters = Arrays.asList(
+                            searchName, searchShortDescription, searchFulLDescription,
+                            searchBrandName, searchCategoryName
+                    );
+
+                    searchFilters.forEach(filter -> {
+                        filter.setValue(keywordSearch);
+                        filter.setOperator(SpecificationOperator.LIKE);
+                    });
+
+                    specification = specification.and(SpecificationHelper
+                            .filterSpecification(searchFilters));
+
                     break;
                 }
 
                 case categoryId: {
-                    categoryId = Integer.valueOf(value);
+                    int categoryId = Integer.valueOf(value);
+                    String categoryIdParentMatch = "-" + categoryId + "-";
+
+                    Filter matchIdFilter = Filter.builder()
+                            .joinTables(Arrays.asList(Product_.CATEGORY))
+                            .field(Category_.ID)
+                            .value(categoryId)
+                            .operator(SpecificationOperator.EQUALS).build();
+
+                    Filter matchIdParentFilter = Filter.builder()
+                            .joinTables(Arrays.asList(Product_.CATEGORY))
+                            .field(Category_.ALL_PARENT_IDS)
+                            .value(categoryIdParentMatch)
+                            .operator(SpecificationOperator.LIKE).build();
+
+                    Specification matchIdParentSpec = SpecificationHelper
+                            .createSpecification(matchIdParentFilter);
+
+                    specification.and(
+                            SpecificationHelper.createSpecification(matchIdFilter)
+                                    .or(matchIdParentSpec)
+                    );
+                    break;
+                }
+
+                case brandId: {
+                    int brandId = Integer.valueOf(value);
+
+                    Filter matchIdFilter = Filter.builder()
+                            .joinTables(Arrays.asList(Product_.BRAND))
+                            .field(Brand_.ID)
+                            .value(brandId)
+                            .operator(SpecificationOperator.EQUALS).build();
+
+                    specification.and(
+                            SpecificationHelper.createSpecification(matchIdFilter)
+                    );
                     break;
                 }
             }
         }
 
-        Pageable pageable =  PageRequest.of(pageIndex, PRODUCT_PER_PAGE, sort);
+        Pageable pageable = RequestParamsHelper.getPageableFromParamRequest(requestParams);
 
-        if (!keywordSearch.isEmpty()) {
-            if (categoryId != null && categoryId > 0) {
-                String categoryIdMatch = "-" + categoryId + "-";
-                productRepository.searchInCategory(categoryId, categoryIdMatch,
-                        keywordSearch, pageable);
-            }
-            return productRepository.findAll(keywordSearch, pageable);
-        }
-
-        if (categoryId != null && categoryId > 0) {
-            String categoryIdMatch = "-" + categoryId + "-";
-            return productRepository.findAllInCategory(categoryId, categoryIdMatch
-                    , pageable);
-        }
-
-        return productRepository.findAll(pageable);
+        return productRepository.findAll(specification, pageable);
     }
 
     public void validateNameUnique(String name) {
@@ -145,7 +172,7 @@ public class ProductService {
         if (product.getAlias().isEmpty() || product.getAlias() == null)
             alias = product.getName();
 
-        alias.replace(" ", "-");
+        alias = alias.replace(" ", "-");
         product.setAlias(alias);
     }
     @Transactional

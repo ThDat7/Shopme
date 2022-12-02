@@ -18,6 +18,8 @@ public class Product_ {
     public static volatile SingularAttribute<Product, String> fullDescription;
     public static volatile SingularAttribute<Product, Category> category;
     public static volatile SingularAttribute<Product, Brand> brand;
+    public static volatile SingularAttribute<Product, Boolean> enabled;
+    public static volatile SingularAttribute<Product, Float> price;
 
     public static final String ID = "id";
     public static final String NAME = "name";
@@ -25,4 +27,6 @@ public class Product_ {
     public static final String FULL_DESCRIPTION = "fullDescription";
     public static final String CATEGORY = "category";
     public static final String BRAND = "brand";
+    public static final String ENABLED = "enabled";
+    public static final String PRICE = "price";
 }

@@ -1,6 +1,6 @@
 package com.shopme.admin.service;
 
-import com.shopme.admin.exception.TokenRefreshException;
+import com.shopme.common.exception.TokenRefreshException;
 import com.shopme.admin.repository.UserRepository;
 import com.shopme.common.entity.RefreshToken;
 import com.shopme.admin.repository.RefreshTokenRepository;

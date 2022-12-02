@@ -19,24 +19,24 @@ public interface ProductRepository extends JpaRepository<Product, Integer>,
     @Modifying
     void updateStatus(int id, boolean status);
 
-    @Query("SELECT p FROM Product p WHERE p.name LIKE %:keyword%" +
-            "OR p.shortDescription LIKE %:keyword%" +
-            "OR p.fullDescription LIKE %:keyword%" +
-            "OR p.brand.name LIKE %:keyword%" +
+    @Query("SELECT p FROM Product p WHERE p.name LIKE %:keyword% " +
+            "OR p.shortDescription LIKE %:keyword% " +
+            "OR p.fullDescription LIKE %:keyword% " +
+            "OR p.brand.name LIKE %:keyword% " +
             "OR p.category.name LIKE %:keyword%")
     Page<Product> findAll(String keyword, Pageable pageable);
 
-    @Query("SELECT p FROM Product p WHERE (p.category.id = ?1" +
+    @Query("SELECT p FROM Product p WHERE (p.category.id = ?1 " +
             "OR p.category.allParentIds LIKE %:categoryIdMatch%)")
     Page<Product> findAllInCategory(int categoryId, String categoryIdMatch,
                                     Pageable pageable);
 
-    @Query("SELECT p FROM Product p WHERE (p.category.id = ?1" +
+    @Query("SELECT p FROM Product p WHERE (p.category.id = ?1 " +
             "OR p.category.allParentIds LIKE %:categoryIdMatch%) AND " +
-            "(p.name LIKE %:keyword%" +
-            "OR p.shortDescription LIKE %:keyword%" +
-            "OR p.fullDescription LIKE %:keyword%" +
-            "OR p.brand.name LIKE %:keyword%" +
+            "(p.name LIKE %:keyword% " +
+            "OR p.shortDescription LIKE %:keyword% " +
+            "OR p.fullDescription LIKE %:keyword% " +
+            "OR p.brand.name LIKE %:keyword% " +
             "OR p.category.name LIKE %:keyword%)")
     Page<Product> searchInCategory(int categoryId, String categoryIdMatch,
                                           String keyword, Pageable pageable);

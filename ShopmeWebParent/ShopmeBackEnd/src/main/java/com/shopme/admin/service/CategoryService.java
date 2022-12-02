@@ -1,18 +1,15 @@
 package com.shopme.admin.service;
 
-import com.shopme.admin.exception.ResourceAlreadyExistException;
-import com.shopme.admin.exception.ResourceNotFoundException;
+import com.shopme.common.exception.ResourceAlreadyExistException;
+import com.shopme.common.exception.ResourceNotFoundException;
 import com.shopme.admin.repository.CategoryRepository;
 import com.shopme.common.entity.Category;
-import com.shopme.common.entity.User;
 import com.shopme.common.metamodel.Category_;
 import com.shopme.common.metamodel.User_;
 import com.shopme.common.paramFilter.CategoryParamFilter;
-import com.shopme.common.paramFilter.UserParamFilter;
 import com.shopme.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;

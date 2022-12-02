@@ -1,7 +1,6 @@
 package com.shopme.admin.security.service;
 
-import com.shopme.admin.exception.ResourceNotFoundException;
-import com.shopme.admin.repository.UserRepository;
+import com.shopme.common.exception.ResourceNotFoundException;
 import com.shopme.admin.security.ShopmeUserDetails;
 import com.shopme.admin.service.UserService;
 import com.shopme.common.entity.User;

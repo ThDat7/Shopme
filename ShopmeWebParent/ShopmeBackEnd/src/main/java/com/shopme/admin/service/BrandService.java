@@ -1,9 +1,9 @@
 package com.shopme.admin.service;
 
 import com.shopme.admin.FileUploadUtil;
-import com.shopme.admin.exception.ImageProcessException;
-import com.shopme.admin.exception.ResourceAlreadyExistException;
-import com.shopme.admin.exception.ResourceNotFoundException;
+import com.shopme.common.exception.ImageProcessException;
+import com.shopme.common.exception.ResourceAlreadyExistException;
+import com.shopme.common.exception.ResourceNotFoundException;
 import com.shopme.admin.repository.BrandRepository;
 import com.shopme.common.entity.Brand;
 import com.shopme.common.entity.Category;

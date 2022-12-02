@@ -1,9 +1,9 @@
 package com.shopme.admin.service;
 
 import com.shopme.admin.FileUploadUtil;
-import com.shopme.admin.exception.ImageProcessException;
-import com.shopme.admin.exception.ResourceAlreadyExistException;
-import com.shopme.admin.exception.ResourceNotFoundException;
+import com.shopme.common.exception.ImageProcessException;
+import com.shopme.common.exception.ResourceAlreadyExistException;
+import com.shopme.common.exception.ResourceNotFoundException;
 import com.shopme.admin.repository.UserRepository;
 import com.shopme.common.entity.User;
 import com.shopme.common.metamodel.User_;

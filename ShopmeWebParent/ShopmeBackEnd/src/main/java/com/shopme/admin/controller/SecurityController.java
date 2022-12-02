@@ -1,6 +1,6 @@
 package com.shopme.admin.controller;
 
-import com.shopme.admin.exception.TokenRefreshException;
+import com.shopme.common.exception.TokenRefreshException;
 import com.shopme.admin.security.ShopmeUserDetails;
 import com.shopme.admin.payload.request.TokenRefreshRequest;
 import com.shopme.admin.payload.response.TokenRefreshResponse;
