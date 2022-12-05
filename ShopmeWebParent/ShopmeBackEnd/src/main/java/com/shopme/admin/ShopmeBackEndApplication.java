@@ -11,6 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @EntityScan({"com.shopme.common", "com.shopme.admin"})
 @ComponentScan({"com.shopme.common", "com.shopme.admin"})
+
 public class ShopmeBackEndApplication {
     public static void main(String[] args) {
         SpringApplication.run(ShopmeBackEndApplication.class, args);

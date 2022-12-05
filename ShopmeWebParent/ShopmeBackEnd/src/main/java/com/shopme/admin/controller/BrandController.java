@@ -73,4 +73,6 @@ public class BrandController {
         CategoryDTO categoryDTO = modelMapper.map(category, CategoryDTO.class);
         return categoryDTO;
     }
+
+
 }

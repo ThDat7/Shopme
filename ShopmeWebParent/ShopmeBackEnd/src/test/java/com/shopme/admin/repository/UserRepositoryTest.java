@@ -8,6 +8,7 @@ import com.shopme.common.specification.SpecificationOperator;
 import com.shopme.common.specification.SpecificationHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,8 +24,13 @@ import java.util.List;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class UserRepositoryTest {
 
-    @Autowired
+    @Qualifier("userRepository")
     private UserRepository repository;
+
+    @Test
+    public void testInjectInterface() {
+        System.out.println(repository.findAll());
+    }
 
 //    @Test
 //    public void testPredicateFilterUser() {

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/products")
 public class ProductController {
     private ProductService productService;
 
@@ -17,7 +17,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping
+    @GetMapping("")
     public ResponseEntity<?> getAll(HashMap<String, String> requestParams) {
         return ResponseEntity.ok().body(productService.getAll(requestParams));
     }
