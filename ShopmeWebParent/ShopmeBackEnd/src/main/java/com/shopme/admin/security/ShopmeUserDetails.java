@@ -2,13 +2,14 @@ package com.shopme.admin.security;
 
 import com.shopme.common.entity.Role;
 import com.shopme.common.entity.User;
+import com.shopme.common.security.CustomUserDetails;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
-public class ShopmeUserDetails implements UserDetails {
+public class ShopmeUserDetails implements CustomUserDetails {
     private User user;
 
     public ShopmeUserDetails(User user) {
@@ -70,5 +71,10 @@ public class ShopmeUserDetails implements UserDetails {
 
         return false;
 
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return user;
     }
 }

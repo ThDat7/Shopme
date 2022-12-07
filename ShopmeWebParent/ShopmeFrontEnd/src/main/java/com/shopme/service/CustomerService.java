@@ -7,23 +7,30 @@ import com.shopme.common.exception.ResourceAlreadyExistException;
 import com.shopme.common.exception.ResourceNotFoundException;
 import com.shopme.repository.CountryRepository;
 import com.shopme.repository.CustomerRepository;
+import com.shopme.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.Optional;
 
 @Service
 public class CustomerService {
+    @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
     private CountryRepository countryRepository;
 
+    @Autowired
+    private JwtService jwtService;
 
-    public CustomerService(CustomerRepository customerRepository, CountryRepository countryRepository) {
-        this.customerRepository = customerRepository;
-        this.countryRepository = countryRepository;
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
 
     public void save(Customer customer) {
     }
@@ -87,6 +94,49 @@ public class CustomerService {
 
             String lastName = namePart[1];
             customer.setLastName(lastName);
+        }
+    }
+
+    public AuthenticationType getAuthenticationType(HttpServletRequest request) {
+        String token = request.getHeader(JwtService.HEADER);
+        return jwtService.getAuthenticationType(token);
+    }
+
+    public Customer getCustomer(HttpServletRequest request) {
+        String token = request.getHeader(JwtService.HEADER);
+        String username = jwtService.getUsername(token);
+
+        return customerRepository.findByEmail(username)
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    public void updateCustomerDetails(Customer customerInForm, HttpServletRequest request) {
+        Customer customerInDb = getCustomer(request);
+
+        if (customerInDb.getAuthenticationType()
+                .equals(AuthenticationType.DATABASE)) {
+            updateCustomerPassword(customerInForm, customerInDb);
+        } else customerInForm.setPassword(
+                customerInDb.getPassword());
+
+        customerInForm.setId(customerInDb.getId());
+        customerInForm.setEnabled(customerInDb.isEnabled());
+        customerInForm.setCreatedTime(customerInDb.getCreatedTime());
+        customerInForm.setVerificationCode(customerInDb.getVerificationCode());
+        customerInForm.setAuthenticationType(customerInDb.getAuthenticationType());
+
+        customerRepository.save(customerInForm);
+    }
+
+    private void updateCustomerPassword(Customer customerInForm, Customer customerInDb) {
+        String newPassword = customerInForm.getPassword();
+        if (newPassword == null || newPassword.isEmpty())
+            customerInForm.setPassword(
+                    customerInDb.getPassword());
+        else {
+            String passwordEncoded = passwordEncoder.encode(
+                    customerInForm.getPassword());
+            customerInForm.setPassword(passwordEncoded);
         }
     }
 }

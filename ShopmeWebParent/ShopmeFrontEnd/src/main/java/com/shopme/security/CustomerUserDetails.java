@@ -1,12 +1,14 @@
 package com.shopme.security;
 
+import com.shopme.common.entity.AuthenticationType;
 import com.shopme.common.entity.Customer;
+import com.shopme.common.security.CustomUserDetails;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-public class CustomerUserDetails implements UserDetails {
+public class CustomerUserDetails implements CustomUserDetails {
     private Customer customer;
 
     public CustomerUserDetails(Customer customer) {
@@ -58,5 +60,10 @@ public class CustomerUserDetails implements UserDetails {
 
     public Customer getCustomer() {
         return this.customer;
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return customer;
     }
 }

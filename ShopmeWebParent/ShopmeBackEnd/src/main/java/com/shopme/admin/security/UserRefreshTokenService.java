@@ -79,6 +79,13 @@ public class UserRefreshTokenService extends RefreshTokenService {
     }
 
     @Override
+    public Object getPrincipal(RefreshTokenDetails refreshTokenDetails) {
+        User user = userRepository.findById(refreshTokenDetails.getUserId()).get();
+
+        return user;
+    }
+
+    @Override
     public int getUserIdByUsername(String username) {
         return userRepository.getIdByUsername(username);
     }

@@ -33,6 +33,8 @@ public abstract class RefreshTokenService {
 
     public abstract String getUsername(RefreshTokenDetails refreshTokenDetails);
 
+    public abstract Object getPrincipal(RefreshTokenDetails refreshTokenDetails);
+
     public abstract int getUserIdByUsername(String username);
 
     public RefreshTokenDetails createRefreshToken(int userId) {

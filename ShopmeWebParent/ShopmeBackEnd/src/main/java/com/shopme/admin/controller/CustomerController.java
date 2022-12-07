@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/customers")
 public class CustomerController {
@@ -45,4 +47,4 @@ public class CustomerController {
     public void checkEmailUnique(@RequestParam("email") String email) {
         customerService.valueEmailUnique(email);
     }
- }
+}

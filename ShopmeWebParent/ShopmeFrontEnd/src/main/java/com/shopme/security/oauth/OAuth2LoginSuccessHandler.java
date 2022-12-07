@@ -45,7 +45,7 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
                 authentication.getPrincipal();
 
         String name = oAuth2User.getName();
-        String email = oAuth2User.getEmail();
+        String email = oAuth2User.getUsername();
         String countryCode = request.getLocale().getCountry();
         String clientName = oAuth2User.getClientName();
 
@@ -63,7 +63,7 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 
         int userId = customer.getId();
 
-        String accessToken = jwtService.generateToken(email);
+        String accessToken = jwtService.generateToken(customer);
         RefreshTokenDetails userRefreshTokenDetails = refreshTokenService
                 .createRefreshToken(userId);
         JwtResponse jwtResponse = new JwtResponse(accessToken, userRefreshTokenDetails.getToken());

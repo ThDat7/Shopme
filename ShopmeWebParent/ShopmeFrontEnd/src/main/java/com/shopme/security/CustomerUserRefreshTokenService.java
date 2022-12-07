@@ -1,5 +1,6 @@
 package com.shopme.security;
 
+import com.shopme.common.entity.Customer;
 import com.shopme.common.entity.CustomerUserRefreshToken;
 import com.shopme.common.security.RefreshTokenDetails;
 import com.shopme.common.security.RefreshTokenService;
@@ -76,6 +77,13 @@ public class CustomerUserRefreshTokenService extends RefreshTokenService {
         String email = customerRepository.findById(userId).get().getEmail();
 
         return email;
+    }
+
+    @Override
+    public Object getPrincipal(RefreshTokenDetails refreshTokenDetails) {
+        int userId = refreshTokenDetails.getUserId();
+        Customer customer = customerRepository.findById(userId).get();
+        return customer;
     }
 
     @Override

@@ -34,9 +34,9 @@ public class SecurityController {
         return refreshTokenService
                 .findByToken(refreshToken)
                 .map(refreshTokenService::verifyExpiration)
-                .map(refreshTokenService::getUsername)
-                .map(username -> {
-                    String accessToken = jwtService.generateToken(username);
+                .map(refreshTokenService::getPrincipal)
+                .map(principal -> {
+                    String accessToken = jwtService.generateToken(principal);
                     return ResponseEntity.ok(new TokenRefreshResponse(accessToken, refreshToken));
                 }).orElseThrow(() -> new TokenRefreshException(refreshToken, "Invalid refresh token."));
 

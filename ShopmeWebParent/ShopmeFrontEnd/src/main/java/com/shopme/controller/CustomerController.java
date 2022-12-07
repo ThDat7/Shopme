@@ -1,11 +1,13 @@
 package com.shopme.controller;
 
 import com.shopme.common.entity.Customer;
+import com.shopme.common.security.service.JwtService;
 import com.shopme.common.setting_bag.EmailSettingBag;
 import com.shopme.service.CustomerService;
 import com.shopme.service.SettingService;
 import com.shopme.setting_helper.MailSettingHelper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.*;
@@ -70,14 +72,29 @@ public class CustomerController {
 
         String fullName = customer.getFirstName() + " " + customer.getLastName();
 
-        content.replace("[[name]]", fullName);
+        content = content.replace("[[name]]", fullName);
         String verifyURL = MailSettingHelper.getSiteURL(request)
                 + "/verify?code=" + customer.getVerificationCode();
-        content.replace("[[URL]]", verifyURL);
+        content = content.replace("[[URL]]", verifyURL);
 
         helper.setText(content, true);
 
         mailSender.send(message);
     }
+
+    @GetMapping("/account_details")
+    public ResponseEntity<?> viewAccountDetails(HttpServletRequest request) {
+        Customer customer = customerService.getCustomer(request);
+
+        return ResponseEntity.ok(customer);
+    }
+
+    @PostMapping("/update_account_details")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateAccountDetails(Customer customer, HttpServletRequest request) {
+        customerService.updateCustomerDetails(customer, request);
+    }
+
+
 
 }

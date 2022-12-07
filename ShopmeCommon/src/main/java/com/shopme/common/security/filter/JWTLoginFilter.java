@@ -1,6 +1,7 @@
 package com.shopme.common.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shopme.common.security.CustomUserDetails;
 import com.shopme.common.security.RefreshTokenDetails;
 import com.shopme.common.security.RefreshTokenService;
 import com.shopme.common.security.payload.response.JwtResponse;
@@ -9,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -41,12 +43,13 @@ public class JWTLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        UserDetails user = (UserDetails) authResult.getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
+        Object principal = userDetails.getPrincipal();
+        String username = userDetails.getUsername();
 
-        String username = user.getUsername();
         int userId = refreshTokenService.getUserIdByUsername(username);
 
-        String accessToken = jwtService.generateToken(username);
+        String accessToken = jwtService.generateToken(principal);
         RefreshTokenDetails userRefreshTokenDetails = refreshTokenService
                 .createRefreshToken(userId);
         JwtResponse jwtResponse = new JwtResponse(accessToken, userRefreshTokenDetails.getToken());
