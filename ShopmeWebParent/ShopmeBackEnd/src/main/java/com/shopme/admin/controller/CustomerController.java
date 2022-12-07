@@ -32,7 +32,7 @@ public class CustomerController {
     @PostMapping("edit/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void edit(Customer customer, @PathVariable("id") int id) {
-        customerService.edit(id, customer);
+        customerService.save(id, customer);
     }
 
     @GetMapping("/{id}/update_status/{status}")

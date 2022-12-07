@@ -5,9 +5,11 @@ import com.shopme.common.entity.Country;
 import com.shopme.common.entity.Customer;
 import com.shopme.common.exception.ResourceAlreadyExistException;
 import com.shopme.common.exception.ResourceNotFoundException;
+import com.shopme.exception.ResetPasswordTokenException;
 import com.shopme.repository.CountryRepository;
 import com.shopme.repository.CustomerRepository;
 import com.shopme.security.JwtService;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,21 @@ public class CustomerService {
 
 
 
-    public void save(Customer customer) {
+    public void registerCustomer(Customer customer) {
+        encodePassword(customer);
+        customer.setEnabled(false);
+        customer.setCreatedTime(new Date());
+        customer.setAuthenticationType(AuthenticationType.DATABASE);
+
+        String randomCode = RandomString.make(64);
+        customer.setVerificationCode(randomCode);
+
+        customerRepository.save(customer);
+    }
+
+    private void encodePassword(Customer customer) {
+        String encodedPassword = passwordEncoder.encode(customer.getPassword());
+        customer.setPassword(encodedPassword);
     }
 
     public void valueEmailUnique(String email) {
@@ -124,6 +140,7 @@ public class CustomerService {
         customerInForm.setCreatedTime(customerInDb.getCreatedTime());
         customerInForm.setVerificationCode(customerInDb.getVerificationCode());
         customerInForm.setAuthenticationType(customerInDb.getAuthenticationType());
+        customerInForm.setResetPasswordToken(customerInDb.getResetPasswordToken());
 
         customerRepository.save(customerInForm);
     }
@@ -139,4 +156,46 @@ public class CustomerService {
             customerInForm.setPassword(passwordEncoded);
         }
     }
+
+    public String updateResetPasswordToken(String email) {
+        Customer customer = customerRepository.findByEmail(email)
+                .orElseThrow(ResourceNotFoundException::new);
+
+        String token = RandomString.make(30);
+        customer.setResetPasswordToken(token);
+        customerRepository.save(customer);
+
+        return token;
+    }
+
+    public void validateResetPasswordToken(String token) {
+        if (!customerRepository
+                .existsByResetPasswordToken(token))
+            throw new ResetPasswordTokenException();
+    }
+
+    public void resetPassword(HttpServletRequest request) {
+        String token = request.getParameter("token");
+
+
+        Optional<Customer> opCustomer = customerRepository.findByResetPasswordToken(token);
+
+        if (!opCustomer.isPresent())
+            throw new ResetPasswordTokenException();
+
+        Customer customer = opCustomer.get();
+        String password = request.getParameter("password");
+        String passwordEncoded = passwordEncoder.encode(password);
+        customer.setPassword(passwordEncoded);
+        customer.setResetPasswordToken(null);
+
+        customerRepository.save(customer);
+
+
+
+
+
+    }
+
+
 }

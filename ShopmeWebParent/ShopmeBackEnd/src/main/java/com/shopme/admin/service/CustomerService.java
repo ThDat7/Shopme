@@ -1,16 +1,13 @@
 package com.shopme.admin.service;
 
 import com.shopme.admin.repository.CustomerRepository;
-import com.shopme.common.entity.AuthenticationType;
 import com.shopme.common.entity.Customer;
 import com.shopme.common.exception.ResourceAlreadyExistException;
 import com.shopme.common.exception.ResourceNotFoundException;
-import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -31,21 +28,27 @@ public class CustomerService {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
-    public void registerCustomer(Customer customer) {
-        encodePassword(customer);
-        customer.setEnabled(false);
-        customer.setCreatedTime(new Date());
-        customer.setAuthenticationType(AuthenticationType.DATABASE);
+    public void save(Integer id, Customer customerInForm) {
+        Customer customerInDB = customerRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
 
-        String randomCode = RandomString.make(64);
-        customer.setVerificationCode(randomCode);
+        if (!customerInForm.getPassword().isEmpty()) {
+            String encodedPassword = passwordEncoder.encode(customerInForm.getPassword());
+            customerInForm.setPassword(encodedPassword);
+        } else {
+            customerInForm.setPassword(customerInDB.getPassword());
+        }
 
-        customerRepository.save(customer);
+        customerInForm.setId(id);
+        customerInForm.setEnabled(customerInDB.isEnabled());
+        customerInForm.setCreatedTime(customerInDB.getCreatedTime());
+        customerInForm.setVerificationCode(customerInDB.getVerificationCode());
+        customerInForm.setAuthenticationType(customerInDB.getAuthenticationType());
+        customerInForm.setResetPasswordToken(customerInDB.getResetPasswordToken());
+
+        customerRepository.save(customerInForm);
     }
 
-    public void edit(int id, Customer customer) {
-        customerRepository.save(customer);
-    }
 
     private void encodePassword(Customer customer) {
         String encodedPassword = passwordEncoder.encode(customer.getPassword());

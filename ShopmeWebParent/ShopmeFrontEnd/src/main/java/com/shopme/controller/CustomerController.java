@@ -29,11 +29,6 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    @PostMapping("/register")
-    @ResponseStatus(HttpStatus.OK)
-    public void create(Customer customer) {
-        customerService.save(customer);
-    }
 
     @PostMapping("/check_email")
     @ResponseStatus(HttpStatus.OK)
@@ -43,11 +38,11 @@ public class CustomerController {
 
     @PostMapping("/create_customer")
     public void createCustomer(Customer customer, HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
-        customerService.save(customer);
+        customerService.registerCustomer(customer);
         sendVerificationEmail(request, customer);
     }
 
-    @GetMapping("verify")
+    @GetMapping("/verify")
     @ResponseStatus(HttpStatus.OK)
     public void verifyAccount(@RequestParam("code")
                               String verificationCode) {
