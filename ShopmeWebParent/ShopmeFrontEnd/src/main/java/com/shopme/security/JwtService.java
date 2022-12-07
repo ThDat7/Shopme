@@ -21,6 +21,8 @@ public class JwtService implements com.shopme.common.security.service.JwtService
     private static class CustomerJwtClaims {
         public static final String USERNAME = "Username";
         public static final String AUTHENTICATION_TYPE = "Authentication_Type";
+
+        public static final String CUSTOMER_ID = "Customer_Id";
     }
 
     @Value("${shopme.app.jwt.ExpirationMs}")
@@ -42,7 +44,11 @@ public class JwtService implements com.shopme.common.security.service.JwtService
         claims.put(CustomerJwtClaims.USERNAME,
                 customer.getEmail());
 
+        claims.put(CustomerJwtClaims.USERNAME,
+                customer.getEmail());
 
+        claims.put(CustomerJwtClaims.CUSTOMER_ID,
+                customer.getId());
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -64,6 +70,11 @@ public class JwtService implements com.shopme.common.security.service.JwtService
     public String getUsername(String token) {
         return (String) getClaims(token)
                 .get(CustomerJwtClaims.USERNAME);
+    }
+
+    public int getCustomerId(String token) {
+        return (int) getClaims(token)
+                .get(CustomerJwtClaims.CUSTOMER_ID);
     }
 
 

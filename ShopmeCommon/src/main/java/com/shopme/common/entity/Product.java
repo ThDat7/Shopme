@@ -79,4 +79,8 @@ public class Product {
     public void addDetail(String name, String value) {
         this.details.add(new ProductDetail(name, value, this));
     }
+
+    public Product(int id) {
+        this.id = id;
+    }
 }

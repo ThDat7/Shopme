@@ -29,6 +29,10 @@ spring:
             scope:
               - user:email
               - read:user
+server:
+  servlet:
+    context-path: /Shopme
+  port: '80'
 
 shopme:
   app:
@@ -38,7 +42,5 @@ shopme:
       refresh:
         ExpirationMs: '86400000'
     refreshTokeName: customer_user_refresh_token
-server:
-  servlet:
-    context-path: /Shopme
-  port: '80'
+    product:
+      max-quantity-product-can-buy: 0
