@@ -74,6 +74,6 @@ public class ForgotPasswordController {
     @PostMapping("/reset_password")
     @ResponseStatus(HttpStatus.OK)
     public void resetPassword(HttpServletRequest request) {
-
+        customerService.resetPassword(request);
     }
 }

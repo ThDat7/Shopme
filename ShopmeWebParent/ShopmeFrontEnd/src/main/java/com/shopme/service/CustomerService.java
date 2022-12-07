@@ -190,11 +190,6 @@ public class CustomerService {
         customer.setResetPasswordToken(null);
 
         customerRepository.save(customer);
-
-
-
-
-
     }
 
 
