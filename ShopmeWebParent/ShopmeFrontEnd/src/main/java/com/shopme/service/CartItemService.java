@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,4 +46,25 @@ public class CartItemService {
 
     }
 
+    public List<CartItem> getAll(int customerId) {
+        return cartItemRepository
+                .findByCustomer(new Customer(customerId));
+    }
+
+    public void updateQuantity(int productId, int quantity, int customerId) {
+        if (maxQuantity > 0 && quantity > maxQuantity)
+            throw new CartItemOutOfQuantityException();
+
+        CartItem cartItem = cartItemRepository
+                .findByCustomerAndProduct(new Customer(customerId),
+                        new Product(productId)).get();
+        if (cartItem == null)
+            cartItem = new CartItem(productId, customerId);
+        cartItem.setQuantity(quantity);
+        cartItemRepository.save(cartItem);
+    }
+
+    public void removeCartItem(int productId, int customerId) {
+        cartItemRepository.deleteByCustomerAndProduct(customerId, productId);
+    }
 }
