@@ -4,6 +4,11 @@ import com.shopme.common.security.RefreshTokenService;
 import com.shopme.common.security.filter.JWTLoginFilter;
 import com.shopme.common.security.filter.JwtAuthorizationFilter;
 import com.shopme.common.security.service.JwtService;
+import com.shopme.repository.CountryRepository;
+import com.shopme.repository.CustomerRepository;
+import com.shopme.security.oauth.CustomerOAuth2UserService;
+import com.shopme.security.oauth.OAuth2LoginSuccessHandler;
+import com.shopme.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,11 +23,20 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private DatabaseLoginSuccessHandler databaseLoginSuccessHandler;
+    @Autowired
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    @Autowired
+    private CustomerOAuth2UserService oAuth2UserService;
+
     @Autowired
     private JwtService jwtService;
 
@@ -53,7 +67,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(authenticationProvider());
     }
 
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -61,10 +74,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable().cors().disable()
                 .authorizeRequests()
                 .antMatchers("/hello/**").authenticated()
-
-
-                .antMatchers("/login", "/refreshtoken").permitAll()
+                .antMatchers("/login", "/oauth/**", "/refreshtoken").permitAll()
                 .anyRequest().authenticated();
+
+        http
+                .formLogin()
+                    .successHandler(databaseLoginSuccessHandler)
+                    .and()
+
+                .oauth2Login()
+                    .userInfoEndpoint()
+                    .userService(oAuth2UserService)
+                    .and() .successHandler(oAuth2LoginSuccessHandler);
 
 
         JWTLoginFilter jwtLoginFilter = new JWTLoginFilter(jwtService, refreshTokenService);

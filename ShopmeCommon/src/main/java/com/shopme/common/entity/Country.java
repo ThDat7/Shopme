@@ -21,7 +21,7 @@ public class Country {
     private String name;
 
     @Column(length = 5, nullable = false)
-    private String ocde;
+    private String code;
 
     @OneToMany(mappedBy = "country")
     private Set<State> states;

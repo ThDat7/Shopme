@@ -1,5 +1,6 @@
 package com.shopme.repository;
 
+import com.shopme.common.entity.AuthenticationType;
 import com.shopme.common.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -23,4 +24,9 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
     @Query("SELECT c.id FROM Customer c WHERE c.email = :username")
     int getIdByUsername(String username);
+
+    @Query("UPDATE Customer c SET c.authenticationType = :authenticationType " +
+            "WHERE c.id = :customerId")
+    @Modifying
+    void updateAuthenticationType(Integer customerId, AuthenticationType authenticationType);
 }

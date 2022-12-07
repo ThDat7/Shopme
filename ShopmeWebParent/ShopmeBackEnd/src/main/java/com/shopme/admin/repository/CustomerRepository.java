@@ -1,5 +1,6 @@
 package com.shopme.admin.repository;
 
+import com.shopme.common.entity.AuthenticationType;
 import com.shopme.common.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
