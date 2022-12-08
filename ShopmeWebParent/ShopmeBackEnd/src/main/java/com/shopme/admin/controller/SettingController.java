@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 
@@ -52,6 +53,14 @@ public class SettingController {
         List<Setting> mailTemplateSettings =  settingService.getMailTemplatesSettings();
         updateSettingValueFromForm(settingByClient, mailTemplateSettings);
     }
+
+    @PostMapping("/settings/save-payment")
+    @ResponseStatus(HttpStatus.OK)
+    public void savePaymentSettings(HashMap<String, String> settingByClient) {
+        List<Setting> paymentSettings = settingService.getPaymentSettings();
+        updateSettingValueFromForm(settingByClient, paymentSettings);
+    }
+
 
     private void updateSettingValueFromForm(HashMap<String, String> settingByClient,
                                             List<Setting> settings) {

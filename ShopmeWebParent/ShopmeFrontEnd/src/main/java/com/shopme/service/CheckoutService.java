@@ -4,6 +4,7 @@ import com.shopme.common.entity.CartItem;
 import com.shopme.common.entity.Product;
 import com.shopme.common.entity.ShippingRate;
 import com.shopme.payload.response.CheckoutInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,8 +13,21 @@ import java.util.List;
 public class CheckoutService {
     private static final int DIM_DIVISOR = 139;
 
-    public CheckoutInfo prepareCheckout(List<CartItem> cartItems
-            , ShippingRate shippingRate) {
+    @Autowired
+    private ShippingRateService shippingRateService;
+
+    @Autowired
+    private ShoppingCartService shoppingCartService;
+
+    public CheckoutInfo prepareCheckout(int customerId) {
+        ShippingRate shippingRate = shippingRateService
+                .getForCustomer(customerId);
+        List<CartItem> cartItems = shoppingCartService.getAll(customerId);
+        return prepareCheckout(cartItems, shippingRate);
+    }
+
+    public CheckoutInfo prepareCheckout(List<CartItem> cartItems,
+                                        ShippingRate shippingRate) {
         float productCost = calculatorProductCost(cartItems);
         float productTotal = calculatorProductTotal(cartItems);
         float shippingCostTotal = calculatorShippingCost(cartItems, shippingRate);
@@ -29,22 +43,26 @@ public class CheckoutService {
                         .build();
     }
 
+    public float getShippingCost(CartItem item, ShippingRate shippingRate) {
+        Product product = item.getProduct();
+        float dimWeight = (product.getWeight() * product.getHeight()
+                * product.getWeight()) / DIM_DIVISOR;
+        float finalWeight = product.getWeight() > dimWeight ?
+                product.getWeight() : dimWeight;
+
+        float shippingCost = finalWeight
+                * item.getQuantity()
+                * shippingRate.getRate();
+
+        return shippingCost;
+    }
+
     private float calculatorShippingCost(List<CartItem> cartItems,
                                          ShippingRate shippingRate) {
         float shippingCostTotal = 0.0f;
 
         for (CartItem item : cartItems) {
-            Product product = item.getProduct();
-            float dimWeight = (product.getWeight() * product.getHeight()
-                    * product.getWeight()) / DIM_DIVISOR;
-            float finalWeight = product.getWeight() > dimWeight ?
-                    product.getWeight() : dimWeight;
-
-            float shippingCost = finalWeight
-                    * item.getQuantity()
-                    * shippingRate.getRate();
-
-            shippingCostTotal += shippingCost;
+            shippingCostTotal += getShippingCost(item, shippingRate);
         }
         return shippingCostTotal;
     }

@@ -66,4 +66,8 @@ public class ShoppingCartService {
     public void removeCartItem(int productId, int customerId) {
         cartItemRepository.deleteByCustomerAndProduct(customerId, productId);
     }
+
+    public void deleteAllByCustomer(int customerId) {
+        cartItemRepository.deleteAllByCustomer(new Customer(customerId));
+    }
 }
