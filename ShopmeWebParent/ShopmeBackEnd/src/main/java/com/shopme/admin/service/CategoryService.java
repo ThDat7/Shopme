@@ -194,14 +194,13 @@ public class CategoryService {
 
     private Category copyFull(Category origin) {
         Category copy = Category.builder()
-                .id(origin.getId())
                 .name(origin.getName())
                 .alias(origin.getAlias())
                 .image(origin.getImage())
                 .enabled(origin.isEnabled())
                 .build();
 
-
+        copy.setId(origin.getId());
         return copy;
     }
     private Category copyFull(Category origin, String name) {
@@ -250,10 +249,10 @@ public class CategoryService {
 
     private Category copyIdAndName(Category origin, String name) {
         Category copy = Category.builder()
-                .id(origin.getId())
                 .name(origin.getName())
                 .build();
 
+        copy.setId(origin.getId());
         copy.setName(name);
         return copy;
     }

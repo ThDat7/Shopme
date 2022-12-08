@@ -15,11 +15,7 @@ import java.util.Set;
 @Entity
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
 @Table(name = "brands")
-public class Brand {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
+public class Brand extends IdBaseEntity {
     @Column(nullable = false, length = 45, unique = true)
     private String name;
 

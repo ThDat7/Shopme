@@ -12,11 +12,7 @@ import java.util.Set;
 @Table(name = "countries")
 
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
-public class Country {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
+public class Country extends IdBaseEntity{
     @Column(length = 45, nullable = false)
     private String name;
 

@@ -11,10 +11,7 @@ import javax.persistence.*;
 @Table(name = "cart_items")
 
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
-public class CartItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+public class CartItem extends IdBaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

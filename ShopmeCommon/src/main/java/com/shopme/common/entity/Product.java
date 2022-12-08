@@ -13,11 +13,7 @@ import java.util.*;
 @Table(name = "products")
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
+public class Product extends IdBaseEntity{
     @Column(nullable = false, unique = true, length = 256)
     private String name;
 
@@ -78,6 +74,7 @@ public class Product {
 
     public void addDetail(String name, String value) {
         this.details.add(new ProductDetail(name, value, this));
+        new ProductDetail(name, value, this);
     }
 
     public Product(int id) {

@@ -10,11 +10,7 @@ import javax.persistence.*;
 @Table(name = "roles")
 
 @Getter @Setter @NoArgsConstructor
-public class Role {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
+public class Role extends IdBaseEntity{
     @Column(unique = true, nullable = false, length = 40)
     private String name;
 

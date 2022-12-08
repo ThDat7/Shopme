@@ -12,10 +12,7 @@ import javax.persistence.*;
 @Table(name = "product_images")
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-public class ProductImage {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+public class ProductImage extends IdBaseEntity{
 
     private String name;
 
@@ -24,7 +21,8 @@ public class ProductImage {
     @JsonBackReference
     private Product product;
 
-    public ProductImage(String name, Product product) {
+    public ProductImage(int id, String name, Product product) {
+        this.id = id;
         this.name = name;
         this.product = product;
     }

@@ -11,10 +11,7 @@ import javax.persistence.*;
 @Table(name = "shipping_rates")
 
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
-public class ShippingRate {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+public class ShippingRate extends IdBaseEntity{
 
     private float rate;
 

@@ -12,11 +12,7 @@ import javax.persistence.*;
 @Table(name = "product_details")
 
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
-public class ProductDetail {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+public class ProductDetail extends IdBaseEntity{
 
     @Column(nullable = false, length = 255)
     private String name;
@@ -29,9 +25,4 @@ public class ProductDetail {
     @JsonBackReference
     private Product product;
 
-    public ProductDetail(String name, String value, Product product) {
-        this.name = name;
-        this.value = value;
-        this.product = product;
-    }
 }

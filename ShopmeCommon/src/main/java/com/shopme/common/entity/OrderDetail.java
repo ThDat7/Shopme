@@ -11,11 +11,7 @@ import javax.persistence.*;
 @Table(name = "order_details")
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-public class OrderDetail {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
+public class OrderDetail extends IdBaseEntity{
     private int quantity;
     private float productCost;
     private float shippingCost;

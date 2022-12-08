@@ -11,11 +11,7 @@ import javax.persistence.*;
 @Table(name = "currency")
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-public class Currency {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
+public class Currency extends IdBaseEntity {
     @Column(length = 64, nullable = false)
     private String name;
 

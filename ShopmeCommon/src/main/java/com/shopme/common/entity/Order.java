@@ -14,34 +14,7 @@ import java.util.Set;
 @Table(name = "orders")
 
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
-public class Order {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
-    @Column(name = "first_name", length = 45, nullable = false)
-    private String firstName;
-
-    @Column(name = "last_name", length = 45, nullable = false)
-    private String lastName;
-
-    @Column(name = "phone_number", length = 15, nullable = false)
-    private String phoneNumber;
-
-    @Column(name = "address_line_1", length = 64, nullable = false)
-    private String addressLine1;
-
-    @Column(name = "address_line_2", length = 64)
-    private String addressLine2;
-
-    @Column(length = 45, nullable = false)
-    private String city;
-
-    @Column(length = 45, nullable = false)
-    private String state;
-
-    @Column(name = "postal_code", length = 10, nullable = false)
-    private String postalCode;
+public class Order extends AbstractAddress{
 
     @Column(length = 45, nullable = false)
     private String country;
