@@ -13,7 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 //@EntityScan({"com.shopme.common"})
 //@ComponentScan({"com.shopme.common", "com.shopme.security",
 //"com.shopme.service", "com.shopme.repository"})
-public class ShopmeFrontEndApplication {
+public class    ShopmeFrontEndApplication {
     public static void main(String[] args) {
         SpringApplication.run(ShopmeFrontEndApplication.class, args);
     }
