@@ -44,3 +44,5 @@ shopme:
     refreshTokeName: customer_user_refresh_token
     product:
       max-quantity-product-can-buy: 0
+    address_book:
+      max-address_book-for-customer: 5
