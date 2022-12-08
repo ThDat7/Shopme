@@ -66,7 +66,8 @@ public class AddressController {
     @ResponseStatus(HttpStatus.OK)
     public void setDefault(@PathVariable("id") int id,
                            HttpServletRequest request) {
-
+        int customerId = getCustomerId(request);
+        addressService.setDefault(id, customerId);
     }
 
 

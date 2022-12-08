@@ -53,6 +53,18 @@ public class AddressService {
     }
 
     public void setDefault(int id, int customerId) {
+        Customer customer = new Customer(customerId);
 
+        if (!addressRepository
+                .existsByIdAndCustomer(id, customer))
+            throw new ResourceNotFoundException();
+
+        addressRepository.setDefault(id, customer);
+        addressRepository.setNoneDefaultForOther(id, customer);
+    }
+
+    public Address getDefault(int customerId) {
+        return addressRepository.findDefault(new Customer(customerId))
+                .orElseThrow(ResourceNotFoundException::new);
     }
 }

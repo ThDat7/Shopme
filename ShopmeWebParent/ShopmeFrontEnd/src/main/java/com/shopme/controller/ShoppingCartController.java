@@ -1,7 +1,7 @@
 package com.shopme.controller;
 
 import com.shopme.security.JwtService;
-import com.shopme.service.CartItemService;
+import com.shopme.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ public class ShoppingCartController {
     private JwtService jwtService;
 
     @Autowired
-    private CartItemService cartItemService;
+    private ShoppingCartService shoppingCartService;
 
     @PostMapping("/add/{productId}/{{quantity}")
     public ResponseEntity<?> addProductToCart(@PathVariable("productId") int productId,
@@ -24,7 +24,7 @@ public class ShoppingCartController {
                                            HttpServletRequest request) {
         int customerId = getCustomerId(request);
 
-        int updatedQuantity = cartItemService
+        int updatedQuantity = shoppingCartService
                 .addProduct(productId, quantity, customerId);
 
         return ResponseEntity.ok(updatedQuantity);
@@ -33,7 +33,7 @@ public class ShoppingCartController {
     @GetMapping()
     public ResponseEntity<?> getAll(HttpServletRequest request) {
         int customerId = getCustomerId(request);
-        return ResponseEntity.ok(cartItemService.getAll(customerId));
+        return ResponseEntity.ok(shoppingCartService.getAll(customerId));
     }
 
     @PostMapping("/update/{productId}/{quantity}")
@@ -43,7 +43,7 @@ public class ShoppingCartController {
                                                 HttpServletRequest request) {
         int customerId = getCustomerId(request);
 
-        cartItemService.updateQuantity(productId, quantity, customerId);
+        shoppingCartService.updateQuantity(productId, quantity, customerId);
     }
 
     @GetMapping("/remove/{productId}/{quantity}")
@@ -52,7 +52,7 @@ public class ShoppingCartController {
                                @PathVariable("quantity") int quantity,
                                HttpServletRequest request) {
         int customerId = getCustomerId(request);
-        cartItemService.removeCartItem(productId, customerId);
+        shoppingCartService.removeCartItem(productId, customerId);
     }
 
     private int getCustomerId(HttpServletRequest request) {
