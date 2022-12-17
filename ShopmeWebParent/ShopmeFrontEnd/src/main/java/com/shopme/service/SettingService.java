@@ -25,4 +25,9 @@ public class SettingService {
 
         return emailSettings;
     }
+
+    public List<Setting> getCurrencySettings() {
+        return settingRepository.findByCategory(SettingCategory.CURRENCY);
+
+    }
 }

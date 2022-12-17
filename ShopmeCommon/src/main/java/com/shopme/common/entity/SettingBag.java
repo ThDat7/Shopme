@@ -9,7 +9,7 @@ public class SettingBag {
         this.listSettings = listSettings;
     }
 
-    public Setting get(String key) {
+    protected Setting get(String key) {
         int index = listSettings.indexOf(new Setting(key));
 
         if (index >= 0) return listSettings.get(index);
