@@ -1,15 +1,15 @@
 package com.shopme.controller;
 
 import com.shopme.common.entity.Order;
+import com.shopme.common.entity.PaymentMethod;
+import com.shopme.common.entity.Setting;
 import com.shopme.common.setting_bag.CurrencySettingBag;
 import com.shopme.common.setting_bag.EmailSettingBag;
+import com.shopme.common.setting_bag.PaymentSettingBag;
 import com.shopme.payload.request.OrderDTO;
 import com.shopme.payload.response.CheckoutInfo;
 import com.shopme.security.JwtService;
-import com.shopme.service.CheckoutService;
-import com.shopme.service.OrderService;
-import com.shopme.service.SettingService;
-import com.shopme.service.ShoppingCartService;
+import com.shopme.service.*;
 import com.shopme.setting_helper.MailSettingHelper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +24,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 @RestController
 @RequestMapping("/checkout")
@@ -43,6 +44,10 @@ public class CheckoutController {
     @Autowired
     private SettingService settingService;
 
+    @Autowired
+    private PaypalService paypalService;
+
+
     @GetMapping
     public ResponseEntity<?> getCheckout(HttpServletRequest request) {
         int customerId = getCustomerId(request);
@@ -60,13 +65,15 @@ public class CheckoutController {
 
     @PostMapping("/place-order")
     @ResponseStatus(HttpStatus.OK)
-    public void placeOrder(OrderDTO orderDTO
-            , HttpServletRequest request) {
+    public void placeOrder(HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
         int customerId = getCustomerId(request);
 
-        Order order = covertToEntity(orderDTO);
-        orderService.createOrder(customerId, order);
+        String paymentType = request.getParameter("paymentMethod");
+        PaymentMethod paymentMethod = PaymentMethod.valueOf(paymentType);
+
+        Order order = orderService.createOrder(customerId, paymentMethod);
         shoppingCartService.deleteAllByCustomer(customerId);
+        sendOrderConfirmationEmail(request, order);
     }
 
     private void sendOrderConfirmationEmail(HttpServletRequest request, Order order) throws MessagingException, UnsupportedEncodingException {
@@ -101,6 +108,27 @@ public class CheckoutController {
 
         helper.setText(content);
         mailSender.send(message);
+    }
+
+    @GetMapping("/paypal_id")
+    public ResponseEntity<?> getPaypalId() {
+        PaymentSettingBag settingBag =
+                new PaymentSettingBag(settingService.getPaymentSettings());
+
+        return ResponseEntity.ok(settingBag.getClientId());
+    }
+
+    @GetMapping("/currency_code")
+    public ResponseEntity<?> getCurrencyCode() {
+        return ResponseEntity.ok(settingService.getCurrencyCode());
+    }
+
+    @PostMapping("/proccess_paypal_order")
+    @ResponseStatus(HttpStatus.OK)
+    public void processPaypalOrder(HttpServletRequest request) throws MessagingException, UnsupportedEncodingException {
+        String orderId = request.getParameter("orderId");
+        paypalService.validateOrder(orderId);
+        placeOrder(request);
     }
 
     private Order covertToEntity(OrderDTO orderDTO) {

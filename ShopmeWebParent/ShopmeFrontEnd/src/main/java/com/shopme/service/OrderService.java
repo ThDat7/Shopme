@@ -36,8 +36,9 @@ public class OrderService {
     private CustomerRepository customerRepository;
 
 
-    public void createOrder(int customerId, Order order) {
+    public Order createOrder(int customerId, PaymentMethod paymentMethod) {
         Customer customer = new Customer(customerId);
+        Order order = new Order();
 
         List<CartItem> cartItems = shoppingCartService.getAll(customerId);
         ShippingRate shippingRate = shippingRateService
@@ -47,7 +48,12 @@ public class OrderService {
                 .prepareCheckout(cartItems, shippingRate);
 
         order.setOrderTime(new Date());
-        order.setStatus(OrderStatus.NEW);
+
+        if (paymentMethod.equals(PaymentMethod.COD))
+            order.setStatus(OrderStatus.NEW);
+        else if (paymentMethod.equals(PaymentMethod.PAYPAL))
+            order.setStatus(OrderStatus.PAID);
+
         order.setCustomer(customer);
         order.setProductCost(checkoutInfo.getProductCost());
         order.setSubtotal(checkoutInfo.getProductTotal());
@@ -71,7 +77,7 @@ public class OrderService {
         order.setOrderDetails(
                 prepareOrderDetails(customerId, order, shippingRate));
 
-        orderRepository.save(order);
+        return orderRepository.save(order);
     }
 
     private Set<OrderDetail> prepareOrderDetails(int customerId

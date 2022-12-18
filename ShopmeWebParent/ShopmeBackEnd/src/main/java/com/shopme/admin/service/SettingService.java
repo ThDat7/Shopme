@@ -1,8 +1,10 @@
 package com.shopme.admin.service;
 
+import com.shopme.admin.repository.CurrencyRepository;
 import com.shopme.admin.repository.SettingRepository;
 import com.shopme.common.entity.Setting;
 import com.shopme.common.entity.SettingCategory;
+import com.shopme.common.exception.ResourceNotFoundException;
 import com.shopme.common.setting_bag.EmailSettingBag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import java.util.List;
 public class SettingService {
     @Autowired
     private SettingRepository settingRepository;
+
 
     public List<Setting> getAll() {
         return settingRepository.findAll();
@@ -43,4 +46,6 @@ public class SettingService {
     public List<Setting> getPaymentSettings() {
         return settingRepository.findByCategory(SettingCategory.PAYMENT);
     }
+
+
 }

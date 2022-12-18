@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SettingRepository extends JpaRepository<Setting, Integer> {
@@ -15,4 +16,6 @@ public interface SettingRepository extends JpaRepository<Setting, Integer> {
     List<Setting> findByTwoCategories(SettingCategory c1, SettingCategory c2);
 
     List<Setting> findByCategory(SettingCategory category);
+
+    Optional<Setting> findByKey(String key);
 }
