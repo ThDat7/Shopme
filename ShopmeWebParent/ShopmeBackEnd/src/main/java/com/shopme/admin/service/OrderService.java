@@ -1,6 +1,6 @@
 package com.shopme.admin.service;
 
-import com.shopme.admin.exception.OrderStatusExistException;
+import com.shopme.common.exception.OrderStatusExistException;
 import com.shopme.admin.repository.OrderRepository;
 import com.shopme.common.entity.Order;
 import com.shopme.common.entity.OrderStatus;
@@ -47,7 +47,7 @@ public class OrderService {
         OrderTrack track = new OrderTrack();
         track.setOrder(order);
         track.setStatus(orderStatus);
-        track.setNote("");
+        track.setNote(orderStatus.defaultDescription());
         track.setUpdateTime(new Date());
 
         order.getOrderTracks().add(track);

@@ -44,7 +44,4 @@ public class Order extends AbstractAddress{
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private Set<OrderDetail> orderDetails = new HashSet<>();
 
-
-
-
 }

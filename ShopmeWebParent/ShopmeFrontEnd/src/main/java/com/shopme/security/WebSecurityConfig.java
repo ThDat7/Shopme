@@ -74,7 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable().cors().disable()
                 .authorizeRequests()
                 .antMatchers("/hello/**").authenticated()
-                .antMatchers("/account_details", "/update_account_details"
+                .antMatchers("/account_details", "/update_account_details", "/orders/**"
                         , "/cart/**", "/address/**", "/place-order", "/proccess_paypal_order").authenticated()
                 .antMatchers("/login", "/oauth/**", "/refreshtoken").permitAll()
 

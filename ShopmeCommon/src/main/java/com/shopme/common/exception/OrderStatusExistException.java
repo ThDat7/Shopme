@@ -1,4 +1,4 @@
-package com.shopme.admin.exception;
+package com.shopme.common.exception;
 
 public class OrderStatusExistException extends RuntimeException {
     private static final String DEFAULT_MESSAGE = "Order status has been exist";

@@ -1,15 +1,22 @@
 package com.shopme.service;
 
 import com.shopme.common.entity.*;
+import com.shopme.common.exception.OrderStatusExistException;
 import com.shopme.common.exception.ResourceNotFoundException;
+import com.shopme.common.paramFilter.RequestParamsHelper;
+import com.shopme.paramFilter.OrderParamFilter;
+import com.shopme.payload.request.OrderReturnRequest;
 import com.shopme.payload.response.CheckoutInfo;
 import com.shopme.repository.CustomerRepository;
 import com.shopme.repository.OrderRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -77,6 +84,14 @@ public class OrderService {
         order.setOrderDetails(
                 prepareOrderDetails(customerId, order, shippingRate));
 
+        OrderTrack track = new OrderTrack();
+        track.setOrder(order);
+        track.setStatus(OrderStatus.NEW);
+        track.setNote(OrderStatus.NEW.defaultDescription());
+        track.setUpdateTime(new Date());
+
+        order.getOrderTracks().add(track);
+
         return orderRepository.save(order);
     }
 
@@ -105,5 +120,62 @@ public class OrderService {
         }
 
         return orderDetails;
+    }
+
+    public Page<Order> getAll(Integer customerId, HashMap<String, String> requestParams) {
+        Pageable pageable = RequestParamsHelper
+                .getPageableFromParamRequest(requestParams);
+
+        for (String key : requestParams.keySet()) {
+            OrderParamFilter orderParamFilter;
+            try {
+                orderParamFilter = OrderParamFilter.valueOf(key);
+            } catch (IllegalArgumentException e) { continue; }
+
+            switch (orderParamFilter) {
+                case keyword: {
+                    String keyword = requestParams.get(key);
+                    OrderStatus orderStatus = null;
+                    try {
+                        orderStatus = OrderStatus.valueOf(keyword);
+                    } catch (IllegalArgumentException e) {}
+
+                    return orderRepository.findAll(customerId, keyword, orderStatus, pageable);
+                }
+            }
+        }
+        return orderRepository.findAll(customerId, pageable);
+    }
+
+    public Order get(int id, int customerId) {
+        return orderRepository.findByIdAndCustomer(id, new Customer(customerId))
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    public void setOrderReturnRequest(OrderReturnRequest orderReturnRequest, int customerId) {
+        Order order = orderRepository.findById(orderReturnRequest.getOrderId())
+                .orElseThrow(ResourceNotFoundException::new);
+
+        order.getOrderTracks().stream()
+                .forEach(orderTrack -> {
+                    if (orderTrack.getStatus().equals(OrderStatus.RETURN_REQUESTED))
+                        throw new OrderStatusExistException();
+                });
+
+        OrderTrack track = new OrderTrack();
+        track.setStatus(OrderStatus.RETURN_REQUESTED);
+        track.setOrder(order);
+        track.setUpdateTime(new Date());
+
+        String note = "Reason " + orderReturnRequest.getReason();
+        if (!orderReturnRequest.getNote().isEmpty())
+            note += ". " + orderReturnRequest.getNote();
+        track.setNote(note);
+
+
+        order.getOrderTracks().add(track);
+        order.setStatus(OrderStatus.RETURN_REQUESTED);
+
+        orderRepository.save(order);
     }
 }
