@@ -97,6 +97,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/login", "/refreshtoken").permitAll()
                     .anyRequest().authenticated();
 
+        http.headers().frameOptions().sameOrigin();
 
         JWTLoginFilter jwtLoginFilter = new JWTLoginFilter(jwtService, refreshTokenService);
         jwtLoginFilter.setAuthenticationManager(authenticationManager());

@@ -98,4 +98,9 @@ public class ProductController {
     public void delete(@PathVariable("id") int id) {
         productService.delete(id);
     }
+
+    @GetMapping("/get_info/{id}")
+    public ResponseEntity<?> getProductInfo(@RequestParam("id") int id) {
+        return ResponseEntity.ok(productService.getById(id));
+    }
 }
