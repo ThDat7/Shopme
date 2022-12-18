@@ -5,13 +5,16 @@ import com.shopme.common.entity.Product;
 import com.shopme.common.entity.ShippingRate;
 import com.shopme.payload.response.CheckoutInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class CheckoutService {
-    private static final int DIM_DIVISOR = 139;
+
+    @Value("${shopme.app.shipping.dim-divisor}")
+    private static int DIM_DIVISOR;
 
     @Autowired
     private ShippingRateService shippingRateService;

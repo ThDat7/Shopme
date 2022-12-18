@@ -43,7 +43,15 @@ public class ShippingRateController {
         shippingRateService.save(shippingRate);
     }
 
+    @PostMapping("/get_shipping_cost")
+    public ResponseEntity<?> calculateShippingCost(int productId,
+                                                   Integer countryId,
+                                                   String state) {
+        float shippingCost = shippingRateService
+                .calculateShippingCost(productId, countryId, state);
 
+        return ResponseEntity.ok(shippingCost);
+    }
 
 
 }

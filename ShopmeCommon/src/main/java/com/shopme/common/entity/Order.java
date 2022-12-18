@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "orders")
@@ -29,6 +27,9 @@ public class Order extends AbstractAddress{
 
     private int deliverDays;
     private Date deliverDate;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderTrack> orderTracks = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
