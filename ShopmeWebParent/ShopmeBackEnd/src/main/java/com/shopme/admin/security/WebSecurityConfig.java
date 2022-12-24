@@ -82,7 +82,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/users/**").hasAnyAuthority("Admin")
                     .antMatchers( "/categories/**").hasAnyAuthority("Admin", "Editor")
                     .antMatchers( "/brands/**").hasAnyAuthority("Admin", "Editor", "Brands")
-                    .antMatchers("/customers/**", "/orders/**", "/shipping_rates/get_shipping_cost").hasAnyAuthority("Admin", "Salesperson")
+                    .antMatchers("/customers/**", "/orders/**", "/shipping_rates/get_shipping_cost",
+                            "/reports/**").hasAnyAuthority("Admin", "Salesperson")
                     .antMatchers("/orders/shipper/update").hasAnyAuthority("Shipper")
 
                     .antMatchers("/products/**").permitAll()

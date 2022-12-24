@@ -80,4 +80,8 @@ public class Product extends IdBaseEntity{
     public Product(int id) {
         this.id = id;
     }
+
+    public Product(String productName) {
+        this.name = productName;
+    }
 }
