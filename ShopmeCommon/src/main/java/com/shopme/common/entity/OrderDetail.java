@@ -26,6 +26,10 @@ public class OrderDetail extends IdBaseEntity{
     @JoinColumn(name = "order_id")
     private Order order;
 
+    public OrderDetail(Integer id) {
+        super(id);
+    }
+
     public OrderDetail(String categoryName, int quantity, float productCost, float shippingCost, float subtotal) {
         this.product = new Product();
         this.product.setCategory(new Category(categoryName));

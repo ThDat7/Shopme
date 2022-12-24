@@ -40,4 +40,13 @@ public interface ProductRepository extends JpaRepository<Product, Integer>,
             "OR p.category.name LIKE %:keyword%)")
     Page<Product> searchInCategory(int categoryId, String categoryIdMatch,
                                           String keyword, Pageable pageable);
+
+    @Query("UPDATE Product p SET p.avgRating = COALESCE(" +
+            "(SELECT AVG(r.rating) FROM Review r" +
+            " WHERE r.orderDetail.product.id = :productId), 0), " +
+            " p.reviewCount = (SELECT COUNT(r.id) FROM Review r" +
+            " WHERE r.orderDetail.product.id = :productId)" +
+            " WHERE p.id = :productId")
+    @Modifying
+    void updateAvgRatingAndReviewCount(Integer productId);
 }

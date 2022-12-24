@@ -68,6 +68,10 @@ public class Product extends IdBaseEntity{
     @JsonManagedReference
     private List<ProductDetail> details = new ArrayList<>();
 
+    private int reviewCount;
+
+    private float avgRating;
+
     public void addExtraImage(String imageName) {
         this.images.add(new ProductImage(imageName, this));
     }

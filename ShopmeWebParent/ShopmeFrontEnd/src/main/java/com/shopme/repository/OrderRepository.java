@@ -14,6 +14,9 @@ import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
+    @Query("SELECT o FROM Order o WHERE o.customer.id = :customerId AND" +
+            " o.status = com.shopme.common.entity.OrderStatus.DELIVERED")
+    List<Order> findAllDelivered(Integer customerId);
     @Query("SELECT o FROM Order o WHERE o.customer.id = :customerId")
     Page<Order> findAll(Integer customerId, Pageable pageable);
 

@@ -150,6 +150,7 @@ public class ProductService {
         setAlias(product);
 
         productRepository.save(product);
+        productRepository.updateAvgRatingAndReviewCount(id);
     }
 
     public void saveProductPrice(int id, Product productInForm) {
