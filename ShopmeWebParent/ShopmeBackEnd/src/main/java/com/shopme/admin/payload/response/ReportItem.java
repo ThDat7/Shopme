@@ -11,6 +11,8 @@ public class ReportItem {
     private float netSales;
     private int ordersCount;
 
+    private int productsCount;
+
     public void addGrossSale(float amount) {
         grossSales += amount;
     }
@@ -21,6 +23,10 @@ public class ReportItem {
 
     public void increaseOrdersCount() {
         ordersCount++;
+    }
+
+    public void increaseProductsCount(int count) {
+        productsCount += count;
     }
 
     public ReportItem(String identifier) {
