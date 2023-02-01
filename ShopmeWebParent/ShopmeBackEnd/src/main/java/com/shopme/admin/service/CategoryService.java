@@ -1,18 +1,15 @@
 package com.shopme.admin.service;
 
-import com.shopme.admin.exception.ResourceAlreadyExistException;
-import com.shopme.admin.exception.ResourceNotFoundException;
+import com.shopme.common.exception.ResourceAlreadyExistException;
+import com.shopme.common.exception.ResourceNotFoundException;
 import com.shopme.admin.repository.CategoryRepository;
 import com.shopme.common.entity.Category;
-import com.shopme.common.entity.User;
 import com.shopme.common.metamodel.Category_;
 import com.shopme.common.metamodel.User_;
 import com.shopme.common.paramFilter.CategoryParamFilter;
-import com.shopme.common.paramFilter.UserParamFilter;
 import com.shopme.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -125,6 +122,13 @@ public class CategoryService {
     }
 
     public void create(Category category) {
+        setAllParentIds(category);
+        repository.save(category);
+    }
+
+    public void edit(int id, Category category) {
+        category.setId(id);
+        setAllParentIds(category);
         repository.save(category);
     }
 
@@ -132,8 +136,14 @@ public class CategoryService {
         repository.deleteById(id);
     }
 
-    public void edit(int id, Category category) {
-        repository.save(category);
+    private void setAllParentIds(Category category) {
+        Category parent = category.getParent();
+
+        if (parent == null) return;
+
+        String allParentIds = parent.getAllParentIds() == null ? "-" : parent.getAllParentIds();
+        allParentIds += parent.getId() + "-";
+        category.setAllParentIds(allParentIds);
     }
 
     public void validateNameUnique(String name) {
@@ -184,14 +194,13 @@ public class CategoryService {
 
     private Category copyFull(Category origin) {
         Category copy = Category.builder()
-                .id(origin.getId())
                 .name(origin.getName())
                 .alias(origin.getAlias())
                 .image(origin.getImage())
                 .enabled(origin.isEnabled())
                 .build();
 
-
+        copy.setId(origin.getId());
         return copy;
     }
     private Category copyFull(Category origin, String name) {
@@ -240,10 +249,10 @@ public class CategoryService {
 
     private Category copyIdAndName(Category origin, String name) {
         Category copy = Category.builder()
-                .id(origin.getId())
                 .name(origin.getName())
                 .build();
 
+        copy.setId(origin.getId());
         copy.setName(name);
         return copy;
     }

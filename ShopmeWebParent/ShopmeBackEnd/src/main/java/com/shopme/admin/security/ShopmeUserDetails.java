@@ -2,16 +2,14 @@ package com.shopme.admin.security;
 
 import com.shopme.common.entity.Role;
 import com.shopme.common.entity.User;
+import com.shopme.common.security.CustomUserDetails;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-public class ShopmeUserDetails implements UserDetails {
+public class ShopmeUserDetails implements CustomUserDetails {
     private User user;
 
     public ShopmeUserDetails(User user) {
@@ -59,5 +57,24 @@ public class ShopmeUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return user.isEnabled();
+    }
+
+    public int getId() {return user.getId();}
+
+    public boolean hasRole(String roleName) {
+        Iterator<Role> roles = this.user.getRoles().iterator();
+
+        while(roles.hasNext()) {
+            Role role = roles.next();
+            if (role.getName().equals(roleName)) return true;
+        }
+
+        return false;
+
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return user;
     }
 }

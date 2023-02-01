@@ -13,10 +13,7 @@ import java.util.Set;
 @Table(name = "users")
 
 @Getter @Setter @NoArgsConstructor
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+public class User extends IdBaseEntity{
 
     @Column(nullable = false, unique = true, length = 128)
     private String email;
@@ -31,7 +28,7 @@ public class User {
     private String lastName;
 
     @Column(length = 64)
-    private String photo;
+    private String photos;
 
     private boolean enabled;
 
@@ -47,7 +44,7 @@ public class User {
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.photo = photo;
+        this.photos = photo;
         this.enabled = enabled;
         this.roles = roles;
     }

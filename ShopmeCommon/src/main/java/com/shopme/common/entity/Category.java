@@ -1,6 +1,9 @@
 package com.shopme.common.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -10,10 +13,7 @@ import java.util.Set;
 @Table(name = "categories")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Builder
-public class Category {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+public class Category extends IdBaseEntity {
 
     @Column(length = 128, nullable = false, unique = true)
     private String name;
@@ -26,11 +26,17 @@ public class Category {
 
     private boolean enabled;
 
+
+    @Column(name = "all_parent_ids", length = 256, nullable = false)
+    private String allParentIds;
+
     @OneToOne()
     @JoinColumn(name = "parent_id")
+    @JsonBackReference
     private Category parent;
 
     @OneToMany(mappedBy = "parent")
+    @JsonManagedReference
     private Set<Category> children = new HashSet<>();
 
     public Category(String name) {
@@ -46,5 +52,14 @@ public class Category {
 
     public Category(int id) {
         this.id = id;
+    }
+
+
+    public Category getParent() {
+        return parent;
+    }
+
+    public Set<Category> getChildren() {
+        return children;
     }
 }

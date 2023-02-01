@@ -1,0 +1,10 @@
+com\shopme\controller\ProductController.class
+com\shopme\MainController.class
+com\shopme\service\CategoryService.class
+com\shopme\repository\ProductRepository.class
+com\shopme\security\WebSecurityConfig.class
+com\shopme\service\ProductService.class
+com\shopme\controller\CategoryController.class
+com\shopme\ShopmeFrontEndApplication.class
+com\shopme\repository\CategoryRepository.class
+com\shopme\controller\MainController.class

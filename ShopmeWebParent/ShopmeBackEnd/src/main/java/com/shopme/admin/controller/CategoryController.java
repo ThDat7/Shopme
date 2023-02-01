@@ -49,13 +49,13 @@ public class CategoryController {
         categoryService.edit(id, category);
     }
 
-    @PostMapping("/check_name")
+    @PostMapping("/check-name")
     @ResponseStatus(HttpStatus.OK)
     public void checkName(@RequestParam("name") String name) {
         categoryService.validateNameUnique(name);
     }
 
-    @PostMapping("/check_alias")
+    @PostMapping("/check-alias")
     @ResponseStatus(HttpStatus.OK)
     public void checkAlias(@RequestParam("alias") String alias) {
         categoryService.validateAliasUnique(alias);

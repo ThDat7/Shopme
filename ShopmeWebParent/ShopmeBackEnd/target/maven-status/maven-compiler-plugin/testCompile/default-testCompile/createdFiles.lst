@@ -1,0 +1,6 @@
+com\shopme\admin\repository\UserRepositoryTest.class
+com\shopme\admin\repository\BrandServiceTests.class
+com\shopme\admin\repository\ProductRepositoryTests.class
+com\shopme\admin\repository\CategoryRepositoryTests.class
+com\shopme\admin\repository\RoleRepositoryTest.class
+com\shopme\admin\repository\BrandRepositoryTest.class

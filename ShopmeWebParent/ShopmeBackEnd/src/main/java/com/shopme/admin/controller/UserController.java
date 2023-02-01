@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -45,9 +45,9 @@ public class UserController {
         userService.create(user, multipartFile);
     }
 
-    @PostMapping("/{id}/update_status/{status}")
-    public void updateStatus(@PathVariable int id,
-                             @PathVariable("status") Boolean status) {
+    @PostMapping("/{id}/update-status/{status}")
+    public void updateStatus(@PathVariable(name = "id") int id,
+                             @PathVariable(name = "status") Boolean status) {
         userService.updateStatus(id, status);
     }
 
@@ -59,7 +59,7 @@ public class UserController {
         userService.edit(id, user, multipartFile);
     }
 
-    @PostMapping("/check_email")
+    @PostMapping("/check-email")
     @ResponseStatus(HttpStatus.OK)
     public void validateEmailUnique(@RequestParam("email") String email) {
         userService.validateEmailUnique(email);

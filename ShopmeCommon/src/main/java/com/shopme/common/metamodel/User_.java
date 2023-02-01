@@ -15,11 +15,11 @@ public class User_ {
     public static volatile SingularAttribute<User, String> lastName;
     public static volatile SingularAttribute<User, String> firstName;
     public static volatile SingularAttribute<User, String> email;
-    public static volatile SingularAttribute<User, Role> role;
+    public static volatile SingularAttribute<User, Role> roles;
 
     public static final String ID = "id";
     public static final String FIRSTNAME = "firstName";
     public static final String LASTNAME = "lastName";
     public static final String EMAIL = "email";
-    public static final String ROLE = "role";
+    public static final String ROLES = "roles";
 }

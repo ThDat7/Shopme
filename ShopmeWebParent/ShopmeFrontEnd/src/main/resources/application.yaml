@@ -1,0 +1,50 @@
+spring:
+  datasource:
+    username: root
+    url: jdbc:mysql://localhost:3306/shopmedatabase
+    password: root
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 447194973714-ilme2tmf3fs9r8h36h2935vj66p7l1lj.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile
+          github:
+            client-id: c1168148b6f3f1ec2440
+            client-secret: dc1bd29513b68981514c093f4df479e4bce2cd6e
+            scope:
+              - user:email
+              - read:user
+server:
+  servlet:
+    context-path: /Shopme
+  port: '80'
+
+shopme:
+  app:
+    jwt:
+      Secret: 1QGda6UVx4
+      ExpirationMs: '3600000'
+      refresh:
+        ExpirationMs: '86400000'
+    refreshTokeName: customer_user_refresh_token
+    product:
+      max-quantity-product-can-buy: 0
+    address_book:
+      max-address_book-for-customer: 5
+    shipping:
+      dim-divisor: 139
