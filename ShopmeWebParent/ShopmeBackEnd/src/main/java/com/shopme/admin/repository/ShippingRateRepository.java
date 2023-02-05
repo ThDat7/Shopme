@@ -3,6 +3,7 @@ package com.shopme.admin.repository;
 import com.shopme.common.entity.Country;
 import com.shopme.common.entity.ShippingRate;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ShippingRateRepository extends JpaRepository<ShippingRate, Integer> {
+public interface ShippingRateRepository extends JpaRepository<ShippingRate, Integer>,
+                                                JpaSpecificationExecutor<ShippingRate> {
     @Modifying
     @Query("UPDATE ShippingRate s SET s.codSupported = :isSupport " +
             "WHERE s.id = :id")

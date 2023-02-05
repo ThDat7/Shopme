@@ -5,11 +5,13 @@ import com.shopme.common.entity.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface BrandRepository extends JpaRepository<Brand, Integer> {
+public interface BrandRepository extends JpaRepository<Brand, Integer>,
+                                         JpaSpecificationExecutor<Brand> {
     boolean existsByName(String name);
 
     @Query("SELECT b FROM Brand b WHERE b.name LIKE %:keywordSearch%")

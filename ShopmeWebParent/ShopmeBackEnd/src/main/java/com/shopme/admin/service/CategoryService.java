@@ -5,20 +5,20 @@ import com.shopme.common.exception.ResourceNotFoundException;
 import com.shopme.admin.repository.CategoryRepository;
 import com.shopme.common.entity.Category;
 import com.shopme.common.metamodel.Category_;
-import com.shopme.common.metamodel.User_;
-import com.shopme.common.paramFilter.CategoryParamFilter;
-import com.shopme.common.util.StringUtils;
+import com.shopme.common.paramFilter.ProductParamFilter;
+import com.shopme.common.paramFilter.RequestParamsHelper;
+import com.shopme.common.specification.Filter;
+import com.shopme.common.specification.SpecificationHelper;
+import com.shopme.common.specification.SpecificationOperator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class CategoryService {
@@ -26,114 +26,71 @@ public class CategoryService {
     private final String PREFIX_SUB_CATEGORY = "--";
 
     @Autowired
-    private CategoryRepository repository;
+    private CategoryRepository categoryRepository;
 
-    @PersistenceContext
-    private EntityManager em;
-
-    public CategoryService(CategoryRepository repository) {
-        this.repository = repository;
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
     }
 
-    public List<Category> getAll(HashMap<String, String> requestParams) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Category> cq = cb.createQuery(Category.class);
-        Root<Category> root = cq.from(Category.class);
-        cq.select(root);
+    public Page<Category> getAll(HashMap<String, String> requestParams) {
+        Specification specification = Specification.not(null);
 
-        Boolean isSearch = false;
-
-        Integer pageNumber = 0;
-        Sort sort = Sort.by(User_.ID);
-
-        for (String key :  requestParams.keySet()) {
+        for (String key : requestParams.keySet()) {
             String value = requestParams.get(key);
 
-            CategoryParamFilter enumKey;
+            ProductParamFilter enumKey;
             try {
-                enumKey = CategoryParamFilter.valueOf(key);
-            } catch(RuntimeException rte) { continue; }
-
+                enumKey = ProductParamFilter.valueOf(key);
+            } catch(IllegalArgumentException e) { continue; }
             switch (enumKey) {
                 case keyword: {
-                    String keyword = "%" + value + "%";
+                    String keywordSearch = value;
+                    Filter searchName = Filter.builder()
+                            .field(Category_.NAME).build();
 
-                    Predicate pd;
-                    pd = cb.like(root.get(Category_.NAME), keyword);
-                    pd = cb.or(pd, cb.like(root.get(Category_.ALIAS), keyword));
-                    if (StringUtils.isInteger(value))
-                        pd = cb.or(pd, cb.equal(root.get(Category_.ID),
-                                Integer.valueOf(value)));
-                    cq.where(pd);
-                    isSearch = true;
+                    Filter searchId = Filter.builder()
+                            .field(Category_.ID).build();
+
+                    List<Filter> searchFilters = Arrays.asList(
+                            searchName, searchId
+                    );
+
+                    searchFilters.forEach(filter -> {
+                        filter.setValue(keywordSearch);
+                        filter.setOperator(SpecificationOperator.LIKE);
+                    });
+
+                    specification = specification.and(SpecificationHelper
+                            .filterSpecification(searchFilters));
+
                     break;
                 }
-
-//                case order: {
-//                    if (value.equals("asc")) sort = sort.ascending();
-//                    else if (value.equals("desc")) sort = sort.descending();
-//                    break;
-//                }
-//
-//                case sortBy: {
-//                    sort = sort.by(value);
-//                    break;
-//                }
-//
-//                case page: {
-//                    if (StringUtils.isInteger(value))
-//                        pageNumber = Integer.valueOf(value) - 1;
-//                    break;
-//                }
             }
-            if (isSearch) break;
         }
 
-//        List<Order> orders = QueryUtils.toOrders(sort, root, cb);
-//        cq.orderBy(orders);
+        Pageable pageable = RequestParamsHelper.getPageableFromParamRequest(requestParams);
 
-        if (!isSearch) {
-            Predicate pd;
-            pd = cb.isNull(root.get(Category_.PARENT));
-            cq.where(pd);
-        }
-
-        List<Category> origin =  em.createQuery(cq)
-                .setFirstResult(pageNumber * CATEGORY_PER_PAGE)
-                .setMaxResults(CATEGORY_PER_PAGE)
-                .getResultList();
-
-        List<Category> result;
-
-        if (isSearch) {
-            result = new ArrayList<>();
-            for (Category copy : origin)
-                result.add(copyFull(copy));
-        } else {
-            result = listHierarchicalCategories(origin);
-        }
-
-        return result;
+        return categoryRepository.findAll(specification, pageable);
     }
 
     public Category getById(int id) {
-        return repository.findById(id)
+        return categoryRepository.findById(id)
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
     public void create(Category category) {
         setAllParentIds(category);
-        repository.save(category);
+        categoryRepository.save(category);
     }
 
     public void edit(int id, Category category) {
         category.setId(id);
         setAllParentIds(category);
-        repository.save(category);
+        categoryRepository.save(category);
     }
 
     public void delete(int id) {
-        repository.deleteById(id);
+        categoryRepository.deleteById(id);
     }
 
     private void setAllParentIds(Category category) {
@@ -147,12 +104,12 @@ public class CategoryService {
     }
 
     public void validateNameUnique(String name) {
-        boolean exists = repository.existsByName(name);
+        boolean exists = categoryRepository.existsByName(name);
         if (exists) throw new ResourceAlreadyExistException();
     }
 
     public void validateAliasUnique(String alias) {
-        boolean exists = repository.existsByAlias(alias);
+        boolean exists = categoryRepository.existsByAlias(alias);
         if (exists) throw new ResourceAlreadyExistException();
     }
 
@@ -210,7 +167,7 @@ public class CategoryService {
     }
 
     public List<Category> listCategoryUsedInForm() {
-        List<Category> roots = repository.getParent();
+        List<Category> roots = categoryRepository.getParent();
 
         List<Category> cateUsedInForm = new ArrayList<>();
 

@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 @RestController
 @RequestMapping("/countries")
 public class CountryController {
@@ -16,8 +18,8 @@ public class CountryController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok(countryService.findAll());
+    public ResponseEntity<?> getAll(@RequestParam HashMap<String, String> requestParams) {
+        return ResponseEntity.ok(countryService.getAll(requestParams));
     }
 
     @PostMapping("/create")

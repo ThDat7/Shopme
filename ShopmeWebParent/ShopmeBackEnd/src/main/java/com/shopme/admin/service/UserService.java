@@ -6,11 +6,19 @@ import com.shopme.common.entity.User;
 import com.shopme.common.exception.ImageProcessException;
 import com.shopme.common.exception.ResourceAlreadyExistException;
 import com.shopme.common.exception.ResourceNotFoundException;
-import com.shopme.common.metamodel.User_;
+import com.shopme.common.metamodel.*;
+import com.shopme.common.paramFilter.ProductParamFilter;
+import com.shopme.common.paramFilter.RequestParamsHelper;
 import com.shopme.common.paramFilter.UserParamFilter;
+import com.shopme.common.specification.Filter;
+import com.shopme.common.specification.SpecificationHelper;
+import com.shopme.common.specification.SpecificationOperator;
 import com.shopme.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +28,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,65 +46,67 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<User> getAll(HashMap<String, String> requestParams) {
+    public Page<User> getAll(HashMap<String, String> requestParams) {
 
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<User> cq = cb.createQuery(User.class);
-        Root<User> root = cq.from(User.class);
-        cq.select(root);
+        Specification specification = Specification.not(null);
 
-        Integer pageIndex = 0;
-        Sort sort = Sort.by(User_.ID);
-
-        for (String key :  requestParams.keySet()) {
+        for (String key : requestParams.keySet()) {
             String value = requestParams.get(key);
 
             UserParamFilter enumKey;
             try {
                 enumKey = UserParamFilter.valueOf(key);
-            } catch(RuntimeException rte) { continue; }
-
+            } catch(IllegalArgumentException e) { continue; }
             switch (enumKey) {
                 case keyword: {
-                    String keyword = "%" + value + "%";
-                    Predicate pd;
+                    String keywordSearch = value;
+                    Filter searchLastName = Filter.builder()
+                            .field(User_.LASTNAME).build();
 
-                    pd = cb.like(root.get(User_.FIRSTNAME), keyword);
-                    pd = cb.or(pd, cb.like(root.get(User_.LASTNAME), keyword));
-                    pd = cb.or(pd, cb.like(root.get(User_.EMAIL), keyword));
-                    if (StringUtils.isInteger(value))
-                            pd = cb.or(pd, cb.equal(root.get(User_.ID),
-                                    Integer.valueOf(value)));
-                    cq.where(pd);
+                    Filter searchFirstName = Filter.builder()
+                            .field(User_.FIRSTNAME).build();
+
+                    Filter searchEmail = Filter.builder()
+                            .field(User_.EMAIL).build();
+
+                    List<Filter> searchFilters = Arrays.asList(
+                            searchLastName, searchFirstName, searchEmail
+                    );
+
+                    searchFilters.forEach(filter -> {
+                        filter.setValue(keywordSearch);
+                        filter.setOperator(SpecificationOperator.LIKE);
+                    });
+
+                    specification = specification.and(SpecificationHelper
+                            .filterSpecification(searchFilters));
+
                     break;
                 }
 
-                case order: {
-                    if (value.equals("asc")) sort = sort.ascending();
-                    else if (value.equals("desc")) sort = sort.descending();
-                    break;
-                }
+                case roleId: {
+                    int roleId = Integer.valueOf(value);
 
-                case sortBy: {
-                    sort = sort.by(value);
-                    break;
-                }
+                    Filter matchRoleId = Filter.builder()
+                            .joinTables(Arrays.asList(User_.ROLES))
+                            .field(Role_.ID)
+                            .value(roleId)
+                            .operator(SpecificationOperator.IN).build();
 
-                case page: {
-                    if (StringUtils.isInteger(value))
-                        pageIndex = Integer.valueOf(value) - 1;
+                    Specification matchRoleIdSpec = SpecificationHelper
+                            .createSpecification(matchRoleId);
+
+                    specification.and(
+                            matchRoleIdSpec
+                    );
                     break;
                 }
             }
         }
 
-        List<Order> orders = QueryUtils.toOrders(sort, root, cb);
-        cq.orderBy(orders);
+        Pageable pageable = RequestParamsHelper.getPageableFromParamRequest(requestParams);
 
-        return em.createQuery(cq)
-                .setFirstResult(pageIndex * USER_PER_PAGE)
-                .setMaxResults(USER_PER_PAGE)
-                .getResultList();
+        return userRepository.findAll(specification, pageable);
     }
 
     public User findById(int id) {

@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 @RestController
 @RequestMapping("/reviews")
 public class ReviewController {
@@ -16,8 +18,8 @@ public class ReviewController {
     private ReviewService reviewService;
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok(reviewService.getAll());
+    public ResponseEntity<?> getAll(HashMap<String, String> requestParams) {
+        return ResponseEntity.ok(reviewService.getAll(requestParams));
     }
 
     @GetMapping("/{id}")

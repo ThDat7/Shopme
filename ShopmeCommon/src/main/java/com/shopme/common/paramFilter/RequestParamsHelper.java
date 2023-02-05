@@ -1,14 +1,21 @@
 package com.shopme.common.paramFilter;
 
+import com.shopme.common.metamodel.Brand_;
+import com.shopme.common.metamodel.Product_;
+import com.shopme.common.specification.Filter;
+import com.shopme.common.specification.SpecificationOperator;
 import com.shopme.common.util.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class RequestParamsHelper {
-    private static final String DEFAULT_FIELD_SORT = "name";
+    private static final String DEFAULT_FIELD_SORT = "id";
     public static final Integer ITEMS_PER_PAGE = 10;
 
     public static Pageable getPageableFromParamRequest(HashMap<String, String> requestParams) {

@@ -79,29 +79,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .accessDeniedHandler(accessDeniedHandler())
                 .and()
                 .authorizeRequests()
-                    .antMatchers("/users/**").hasAnyAuthority("Admin")
-                    .antMatchers( "/categories/**").hasAnyAuthority("Admin", "Editor")
-                    .antMatchers( "/brands/**").hasAnyAuthority("Admin", "Editor", "Brands")
-                    .antMatchers("/customers/**", "/orders/**", "/shipping_rates/get_shipping_cost",
-                            "/reports/**").hasAnyAuthority("Admin", "Salesperson")
-                    .antMatchers("/orders/shipper/update").hasAnyAuthority("Shipper")
-
-                .antMatchers("/products/detail/**", "/customers/detail/**")
-                .hasAnyAuthority("Admin", "Editor", "Salesperson", "Assistant")
-
-                .antMatchers("/reviews/**").hasAnyAuthority("Admin", "Assistant")
-                    .antMatchers("/products/**").permitAll()
-//                    .antMatchers("/products/create", "/products/**/delete")
-//                        .hasAnyAuthority("Admin", "Editor")
-//                    .antMatchers("/products/**/edit", "/products/save", "/products/check-name")
-//                        .hasAnyAuthority("Admin", "Editor", "Salesperson")
-//                    .antMatchers("/products", "/products/")
-//                        .hasAnyAuthority("Admin", "Edtior", "Salesperson", "Shipper")
-//                    .antMatchers("/products/**").hasAnyAuthority("Admin", "Edtior")
-
-
-                    .antMatchers("/login", "/refreshtoken").permitAll()
-                    .anyRequest().authenticated();
+//                    .antMatchers("/users/**").hasAnyAuthority("Admin")
+//                    .antMatchers( "/categories/**").hasAnyAuthority("Admin", "Editor")
+//                    .antMatchers( "/brands/**").hasAnyAuthority("Admin", "Editor", "Brands")
+//                    .antMatchers("/customers/**", "/orders/**", "/shipping_rates/get_shipping_cost",
+//                            "/reports/**").hasAnyAuthority("Admin", "Salesperson")
+//                    .antMatchers("/orders/shipper/update").hasAnyAuthority("Shipper")
+//
+//                .antMatchers("/products/detail/**", "/customers/detail/**")
+//                .hasAnyAuthority("Admin", "Editor", "Salesperson", "Assistant")
+//
+//                .antMatchers("/reviews/**").hasAnyAuthority("Admin", "Assistant")
+//                    .antMatchers("/products/**").permitAll()
+////                    .antMatchers("/products/create", "/products/**/delete")
+////                        .hasAnyAuthority("Admin", "Editor")
+////                    .antMatchers("/products/**/edit", "/products/save", "/products/check-name")
+////                        .hasAnyAuthority("Admin", "Editor", "Salesperson")
+////                    .antMatchers("/products", "/products/")
+////                        .hasAnyAuthority("Admin", "Edtior", "Salesperson", "Shipper")
+////                    .antMatchers("/products/**").hasAnyAuthority("Admin", "Edtior")
+//
+//
+//                    .antMatchers("/login", "/refreshtoken").permitAll()
+//                .antMatchers("/user_dto/**").permitAll()
+                    .anyRequest().permitAll();
 
         http.headers().frameOptions().sameOrigin();
 

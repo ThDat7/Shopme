@@ -5,11 +5,23 @@ import com.shopme.admin.repository.ShippingRateRepository;
 import com.shopme.common.entity.Product;
 import com.shopme.common.entity.ShippingRate;
 import com.shopme.common.exception.ResourceNotFoundException;
+import com.shopme.common.metamodel.*;
+import com.shopme.common.paramFilter.ProductParamFilter;
+import com.shopme.common.paramFilter.RequestParamsHelper;
+import com.shopme.common.paramFilter.ShippingRateParamFilter;
+import com.shopme.common.specification.Filter;
+import com.shopme.common.specification.SpecificationHelper;
+import com.shopme.common.specification.SpecificationOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -24,8 +36,47 @@ public class ShippingRateService {
     @Value("${shopme.app.shipping.dim-divisor}")
     private static int DIM_DIVISOR;
 
-    public List<ShippingRate> getAll() {
-        return shippingRateRepository.findAll();
+    public Page<ShippingRate> getAll(HashMap<String, String> requestParams) {
+        Specification specification = Specification.not(null);
+
+        for (String key : requestParams.keySet()) {
+            String value = requestParams.get(key);
+
+            ShippingRateParamFilter enumKey;
+            try {
+                enumKey = ShippingRateParamFilter.valueOf(key);
+            } catch(IllegalArgumentException e) { continue; }
+            switch (enumKey) {
+                case keyword: {
+                    String keywordSearch = value;
+                    Filter searchCountryName = Filter.builder()
+                            .joinTables(Arrays.asList(ShippingRate_.COUNTRY))
+                            .field(Country_.NAME).build();
+
+                    Filter searchState = Filter.builder()
+                            .field(ShippingRate_.STATE).build();
+
+
+                    List<Filter> searchFilters = Arrays.asList(
+                            searchCountryName, searchState
+                    );
+
+                    searchFilters.forEach(filter -> {
+                        filter.setValue(keywordSearch);
+                        filter.setOperator(SpecificationOperator.LIKE);
+                    });
+
+                    specification = specification.and(SpecificationHelper
+                            .filterSpecification(searchFilters));
+
+                    break;
+                }
+            }
+        }
+
+        Pageable pageable = RequestParamsHelper.getPageableFromParamRequest(requestParams);
+
+        return productRepository.findAll(specification, pageable);
     }
 
     public void edit(int id, ShippingRate shippingRate) {

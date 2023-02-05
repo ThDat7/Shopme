@@ -1,39 +1,56 @@
 package com.shopme.admin.controller;
 
+import com.shopme.admin.dto.CategoryCreateDTO;
+import com.shopme.admin.dto.CategoryListDTO;
+import com.shopme.admin.service.BrandService;
 import com.shopme.admin.service.CategoryService;
+import com.shopme.common.dto.CategoryDTO;
 import com.shopme.common.entity.Category;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/category")
+@RequestMapping("/categories")
 public class CategoryController {
 
+    @Autowired
     private CategoryService categoryService;
 
-    public CategoryController(CategoryService service) {
-        this.categoryService = service;
-    }
+    @Autowired
+    private BrandService brandService;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
 
     @GetMapping("")
     public ResponseEntity<?> getAll(
             @RequestParam HashMap<String, String> requestParams
             ) {
-        return ResponseEntity.ok(categoryService.getAll(requestParams));
+        return ResponseEntity.ok(mapToDTO(categoryService.getAll(requestParams)));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable("id") int id) {
-        return ResponseEntity.ok(categoryService.getById(id));
+        return ResponseEntity.ok(mapToDTO(categoryService.getById(id)));
     }
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.OK)
-    public void create(Category category) {
+    public void create(@RequestPart("category") CategoryCreateDTO categoryDTO,
+                       @RequestPart(value = "image", required = false)
+                       MultipartFile multipartFile) {
+        Category category = mapToEntity(categoryDTO);
         categoryService.create(category);
     }
 
@@ -45,7 +62,11 @@ public class CategoryController {
 
     @PostMapping("/edit/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void edit(Category category, @PathVariable("id") int id) {
+    public void edit(@RequestPart("category") CategoryCreateDTO categoryDTO,
+                     @PathVariable("id") int id,
+                     @RequestPart(value = "image", required = false)
+                     MultipartFile multipartFile ){
+        Category category = mapToEntity(categoryDTO);
         categoryService.edit(id, category);
     }
 
@@ -63,7 +84,37 @@ public class CategoryController {
 
     @GetMapping("/get-cate-in-form")
     public ResponseEntity getCategoriesUsedInForm() {
-        List<Category> cateUsedInForm = categoryService.listCategoryUsedInForm();
-        return ResponseEntity.ok(cateUsedInForm);
+        return ResponseEntity.ok(
+                mapToDTO(categoryService.listCategoryUsedInForm())
+        );
+    }
+
+    @GetMapping("/{id}/categories")
+    public ResponseEntity<?> getCategoriesByBrand(@PathVariable(name = "id") int id) {
+        return ResponseEntity.ok().body(
+                mapToDTO(brandService.getCategoriesByBrandId(id))
+        );
+    }
+
+    private Category mapToEntity(CategoryCreateDTO categoryCreateDTO) {
+        return modelMapper.map(categoryCreateDTO, Category.class);
+    }
+
+    private CategoryListDTO mapToDTO(Category category) {
+        return modelMapper.map(category, CategoryListDTO.class);
+    }
+
+    private Page<CategoryListDTO> mapToDTO(Page<Category> categoryPage) {
+        return categoryPage.map(new Function<Category, CategoryListDTO>() {
+            @Override
+            public CategoryListDTO apply(Category category) {
+                return mapToDTO(category);
+            }
+        });
+    }
+
+    private List<CategoryListDTO> mapToDTO(List<Category> categoryPage) {
+        return categoryPage.stream().map(i -> mapToDTO(i))
+                .collect(Collectors.toList());
     }
 }

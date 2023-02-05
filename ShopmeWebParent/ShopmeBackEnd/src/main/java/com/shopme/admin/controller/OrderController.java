@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 @Controller
 @RequestMapping("/orders")
 public class OrderController {
@@ -15,8 +17,8 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok(orderService.getAll());
+    public ResponseEntity<?> getAll(@RequestParam HashMap<String, String> requestParams) {
+        return ResponseEntity.ok(orderService.getAll(requestParams));
     }
 
     @GetMapping("/{id}")
