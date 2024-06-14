@@ -36,6 +36,3 @@ Shopme is a eCommerce Application to shopping for clients and management tools f
 ### Frameworks
 
 - Spring Boot
-- Thymeleaf
-- Bootstrap
-- Jquery
